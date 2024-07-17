@@ -15,8 +15,6 @@ spring:
         level:
             org:
                 springframework: DEBUG
-    jwt:
-        issuer: ajufresh@gmail.com
     messages:
         base-name: i18n/messages
         encoding: UTF-8
