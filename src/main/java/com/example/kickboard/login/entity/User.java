@@ -4,10 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-
-import com.example.kickboard.kickboard.entity.DataRecord;
 
 @Entity
 @Builder
@@ -46,23 +42,11 @@ public class User {
     @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00:00'")
     private LocalTime useTime;
 
-    //@Column(name = "identity", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'a'")
-    //private String identity;
-
     @Column(name = "face", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'b'")
     private String face;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DataRecord> dataRecords = new ArrayList<>();
+    // identity : csv 저장 위치가 기록됨.
+    @Column(name = "identity", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'x'")
+    private String identity;
 
-    //@OneToMany(mappedBy = "user")
-    //private List<DataRecord> dataRecords;
-
-    public void setDataRecords(List<DataRecord> dataRecords) {
-        this.dataRecords = dataRecords;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 }

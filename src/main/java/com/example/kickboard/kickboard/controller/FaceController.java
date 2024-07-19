@@ -1,7 +1,7 @@
 package com.example.kickboard.kickboard.controller;
 
 
-import com.example.kickboard.kickboard.service.CSVService;
+import com.example.kickboard.kickboard.service.FaceService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -17,8 +17,9 @@ import java.io.InputStreamReader;
 public class FaceController {
 
     @Autowired
-    private CSVService csvService;
+    private FaceService faceService;
 
+    // 앱에 자신의 면허증 - 얼굴 등록
     @PostMapping("/first")
     public ResponseEntity<String> runPythonAndSaveCSV(@RequestParam("userId") Long userId) {
         try {
@@ -47,7 +48,7 @@ public class FaceController {
             int exitCode = process.waitFor();
             if (exitCode == 0) {
                 // CSV 파일을 데이터베이스에 저장
-                csvService.saveCSVToDatabase("C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/output/face_features_output.csv", userId);
+                faceService.saveCSVToDatabase("C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/face_rec_data/face_features_output.csv", userId);
                 return ResponseEntity.ok("CSV file processed and data saved to database.");
             } else {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Python script execution failed");
@@ -58,6 +59,4 @@ public class FaceController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred: " + e.getMessage());
         }
     }
-
-
 }
