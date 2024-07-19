@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.kickboard.kickboard.entity.DataRecord;
@@ -22,7 +23,7 @@ public class User {
     @Column(name = "id", updatable= false)
     private Long id;
 
-    @Column(name = "nickname", nullable = true)
+    @Column(name = "nickname")
     private String nickname;
 
     @Column(name = "phone", nullable = false, unique= true)
@@ -51,8 +52,11 @@ public class User {
     @Column(name = "face", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'b'")
     private String face;
 
-    @OneToMany(mappedBy = "user")
-    private List<DataRecord> dataRecords;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DataRecord> dataRecords = new ArrayList<>();
+
+    //@OneToMany(mappedBy = "user")
+    //private List<DataRecord> dataRecords;
 
     public void setDataRecords(List<DataRecord> dataRecords) {
         this.dataRecords = dataRecords;

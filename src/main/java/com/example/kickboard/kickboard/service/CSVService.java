@@ -10,7 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 public class CSVService {
@@ -41,36 +43,3 @@ public class CSVService {
         }
     }
 }
-
-/*
-@Service
-public class CSVService {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    public void saveCSVToDatabase(String filePath, Long userId) {
-        try {
-            User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
-
-            Path path = Paths.get(filePath);
-            try (Reader reader = new FileReader(path.toFile());
-                 CSVParser csvParser = new CSVParser(reader, CSVFormat.DEFAULT.withFirstRecordAsHeader())) {
-
-                for (CSVRecord csvRecord : csvParser) {
-                    DataRecord dataRecord = new DataRecord();
-                    dataRecord.setFeature(csvRecord.get(""));
-                    dataRecord.setCol1(csvRecord.get(""));
-                    dataRecord.setCol2(csvRecord.get(""));
-                    // 필요한 필드 설정
-                    dataRecord.setUser(user);
-
-                    userRepository.save(dataRecord);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-}
-*/
