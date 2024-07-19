@@ -25,7 +25,6 @@ public class FaceController {
             ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/picNface.py");
             Process process = pb.start();
 
-            //
             // 표준 출력 및 오류 읽기
             BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
             BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
