@@ -1,7 +1,5 @@
 package com.example.kickboard.kickboard.controller;
 
-
-import com.example.kickboard.kickboard.dto.KakaoApiResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
 import com.example.kickboard.kickboard.entity.Penalty;
 import com.example.kickboard.kickboard.service.PenaltyService;
