@@ -32,7 +32,7 @@ public class Penalty {
     @Column(name = "photo", updatable= false)
     private String photo;
 
-    // 주소명
+    // 지번 주소
     @Column(name = "location", updatable= false)
     private String location;
 

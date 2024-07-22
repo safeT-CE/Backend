@@ -53,23 +53,4 @@ public class PenaltyController {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
-
-    // PMap 위도, 경도 데이터 -> Penalty location 가져오기
-    @GetMapping("/address")
-    public ResponseEntity<?> getAddress(@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude){
-        ResponseEntity<KakaoApiResponse> response = penaltyService.getAddressFromCoordinates(latitude, longitude);
-
-        if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getDocuments().isEmpty()){
-            return ResponseEntity.ok(response.getBody().getDocuments().get(0));
-        } else if(response.getStatusCode().is4xxClientError()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Client error: " + response.getStatusCode());
-        } else if (response.getStatusCode().is5xxServerError()) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + response.getStatusCode());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address not found");
-        }
-
-    }
-
-
 }
