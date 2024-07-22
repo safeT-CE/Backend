@@ -32,9 +32,11 @@ public class Penalty {
     @Column(name = "photo", updatable= false)
     private String photo;
 
+    // 주소명
     @Column(name = "location", updatable= false)
     private String location;
 
+    // 위도, 경도
     @Embedded
     private PMap map;
 

@@ -1,6 +1,7 @@
 package com.example.kickboard.kickboard.controller;
 
 
+import com.example.kickboard.kickboard.dto.KakaoApiResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
 import com.example.kickboard.kickboard.entity.Penalty;
 import com.example.kickboard.kickboard.service.PenaltyService;
@@ -31,8 +32,8 @@ public class PenaltyController {
                 response.put("message", "No penalty points found for the given userId.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            response.put("message", "Penalty points were successfully searched in DB");
             response.put("data", penalties);
+            response.put("message", "Penalty points were successfully searched in DB");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,13 +44,32 @@ public class PenaltyController {
 
     // Penalty 추가 : 임시로 만들어 놓음
     @PostMapping
-    public ResponseEntity<?> createPenalty(@RequestParam("userId") Long userId, @RequestBody PenaltyRequest request){
-        try{
+    public ResponseEntity<?> createPenalty(@RequestParam("userId") Long userId, @RequestBody PenaltyRequest request) {
+        try {
             Penalty penalty = penaltyService.createPenalty(userId, request);
             return new ResponseEntity<>(penalty, HttpStatus.CREATED);
 
-        }catch(IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
+
+    // PMap 위도, 경도 데이터 -> Penalty location 가져오기
+    @GetMapping("/address")
+    public ResponseEntity<?> getAddress(@RequestParam("latitude") double latitude, @RequestParam("longitude") double longitude){
+        ResponseEntity<KakaoApiResponse> response = penaltyService.getAddressFromCoordinates(latitude, longitude);
+
+        if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getDocuments().isEmpty()){
+            return ResponseEntity.ok(response.getBody().getDocuments().get(0));
+        } else if(response.getStatusCode().is4xxClientError()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Client error: " + response.getStatusCode());
+        } else if (response.getStatusCode().is5xxServerError()) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error: " + response.getStatusCode());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Address not found");
+        }
+
+    }
+
+
 }

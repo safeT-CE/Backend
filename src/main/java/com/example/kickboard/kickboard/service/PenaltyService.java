@@ -1,5 +1,6 @@
 package com.example.kickboard.kickboard.service;
 
+import com.example.kickboard.kickboard.dto.KakaoApiResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
 import com.example.kickboard.kickboard.entity.Penalty;
 import com.example.kickboard.kickboard.repository.PenaltyRepository;
@@ -7,9 +8,13 @@ import com.example.kickboard.login.entity.User;
 import com.example.kickboard.login.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.kickboard.kickboard.entity.PMap;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -21,15 +26,21 @@ public class PenaltyService {
     private final PenaltyRepository penaltyRepository;
     private final UserRepository userRepository;
 
+    @Value("${KAKAO_API_KEY}")
+    private String apiKey;
+
+    private final RestTemplate restTemplate;
+
     @Autowired
-    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository) {
+    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository, RestTemplate restTemplate) {
         this.penaltyRepository = penaltyRepository;
         this.userRepository = userRepository;
+        this.restTemplate = restTemplate;
     }
 
     @Transactional
     public List<Penalty> getPenaltiesByUserId(Long userId) {
-            return penaltyRepository.findAllByUserId(userId);
+            return penaltyRepository.findByUserId(userId);
     }
 
     @Transactional
@@ -52,5 +63,29 @@ public class PenaltyService {
         penalty.setCount((int) penaltyRepository.countByUserId(userId) + 1);
 
         return penaltyRepository.save(penalty);
+    }
+
+    // 위도, 경도 -> 주소명 (PMap -> Penalty.location)
+
+    public ResponseEntity<KakaoApiResponse> getAddressFromCoordinates(double latitude, double longitude) {
+        String url = "https://dapi.kakao.com/v2/local/geo/coord2address.json";
+        UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
+                .queryParam("x", longitude)
+                .queryParam("y", latitude);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "KakaoAK " + apiKey);
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+
+        ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(
+                uriBuilder.toUriString(),
+                HttpMethod.GET,
+                entity,
+                KakaoApiResponse.class
+        );
+
+        log.info("PenaltyService : " + response.getBody());
+        return response;
     }
 }
