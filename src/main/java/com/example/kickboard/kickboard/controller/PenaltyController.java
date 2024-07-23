@@ -1,6 +1,7 @@
 package com.example.kickboard.kickboard.controller;
 
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
+import com.example.kickboard.kickboard.dto.PenaltySummaryResponse;
 import com.example.kickboard.kickboard.entity.Penalty;
 import com.example.kickboard.kickboard.service.PenaltyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class PenaltyController {
     @Autowired
     private PenaltyService penaltyService;
 
+    // 전체 조회
     @GetMapping("/check")
     public ResponseEntity<Map<String, Object>> checkPenalty(@RequestParam("userId") Long userId) {
         Map<String, Object> response = new HashMap<>();
@@ -39,6 +41,17 @@ public class PenaltyController {
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
+    // 기본 조회
+    @GetMapping("/check/first")
+    public ResponseEntity<Map<String, Object>> getPenaltySummaries(@RequestParam("userId") Long userId){
+        Map<String, Object> response = new HashMap<>();
+        List<PenaltySummaryResponse> penalties = penaltyService.getPenaltySummaries(userId);
+        response.put("penalty", penalties);
+        response.put("message", "Penalty points were successfully searched in DB");
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+
 
     // Penalty 추가 : 임시로 만들어 놓음
     @PostMapping

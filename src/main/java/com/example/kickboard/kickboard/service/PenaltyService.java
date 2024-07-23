@@ -2,6 +2,7 @@ package com.example.kickboard.kickboard.service;
 
 import com.example.kickboard.kickboard.dto.KakaoApiResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
+import com.example.kickboard.kickboard.dto.PenaltySummaryResponse;
 import com.example.kickboard.kickboard.entity.Penalty;
 import com.example.kickboard.kickboard.exception.CustomException;
 import com.example.kickboard.kickboard.repository.PenaltyRepository;
@@ -17,8 +18,10 @@ import com.example.kickboard.kickboard.entity.PMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -39,11 +42,37 @@ public class PenaltyService {
         this.restTemplate = restTemplate;
     }
 
+    // 벌점 기록 전체 조회
     @Transactional
     public List<Penalty> getPenaltiesByUserId(Long userId) {
             return penaltyRepository.findByUserId(userId);
     }
 
+    // 벌점 기록 기본 조회
+    @Transactional
+    public List<PenaltySummaryResponse> getPenaltySummaries(Long userId) {
+        List<Penalty> penalties = penaltyRepository.findByUserId(userId);
+        return penalties.stream()
+                .map(penalty -> new PenaltySummaryResponse(
+                        penalty.getContent(),
+                        penalty.getDate(),
+                        penalty.getCount(),
+                        convertPMapToMap(penalty.getMap())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    private Map<String, Object> convertPMapToMap(PMap pMap) {
+        Map<String, Object> map = new HashMap<>();
+        if (pMap != null) {
+            map.put("latitude", pMap.getLatitude());
+            map.put("longitude", pMap.getLongitude());
+        }
+        return map;
+    }
+
+
+    // 벌점 기록 생성하기
     @Transactional
     public Penalty createPenalty(Long userId, PenaltyRequest request){
         try {
@@ -115,4 +144,5 @@ public class PenaltyService {
         //log.info("PenaltyService : " + response.getBody());
         return response;
     }
+
 }
