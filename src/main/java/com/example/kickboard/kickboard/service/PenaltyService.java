@@ -1,6 +1,7 @@
 package com.example.kickboard.kickboard.service;
 
 import com.example.kickboard.kickboard.dto.KakaoApiResponse;
+import com.example.kickboard.kickboard.dto.PenaltyDetailResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
 import com.example.kickboard.kickboard.dto.PenaltySummaryResponse;
 import com.example.kickboard.kickboard.entity.Penalty;
@@ -58,6 +59,22 @@ public class PenaltyService {
                         penalty.getDate(),
                         penalty.getCount(),
                         convertPMapToMap(penalty.getMap())
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public List<PenaltyDetailResponse> getPenaltyDetail(Long userId) {
+        List<Penalty> penalties = penaltyRepository.findByUserId(userId);
+        log.info("PenaltyService : " + userId);
+        return penalties.stream()
+                .map(penalty -> new PenaltyDetailResponse(
+                        penalty.getContent(),
+                        penalty.getDate(),
+                        penalty.getCount(),
+                        penalty.getLocation(),
+                        convertPMapToMap(penalty.getMap()),
+                        penalty.getPhoto()
                 ))
                 .collect(Collectors.toList());
     }
@@ -144,5 +161,4 @@ public class PenaltyService {
         //log.info("PenaltyService : " + response.getBody());
         return response;
     }
-
 }

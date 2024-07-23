@@ -1,5 +1,6 @@
 package com.example.kickboard.kickboard.controller;
 
+import com.example.kickboard.kickboard.dto.PenaltyDetailResponse;
 import com.example.kickboard.kickboard.dto.PenaltyRequest;
 import com.example.kickboard.kickboard.dto.PenaltySummaryResponse;
 import com.example.kickboard.kickboard.entity.Penalty;
@@ -43,14 +44,39 @@ public class PenaltyController {
     }
 
     // 기본 조회
-    @GetMapping("/check/first")
+    @GetMapping("/check/summary")
     public ResponseEntity<Map<String, Object>> getPenaltySummaries(@RequestParam("userId") Long userId){
         Map<String, Object> response = new HashMap<>();
-        List<PenaltySummaryResponse> penalties = penaltyService.getPenaltySummaries(userId);
-        response.put("penalty", penalties);
-        response.put("message", "Penalty points were successfully searched in DB");
-        return new ResponseEntity<>(response, HttpStatus.OK);
+
+        try {
+             List<PenaltySummaryResponse> penalties = penaltyService.getPenaltySummaries(userId);
+             response.put("penalty", penalties);
+             response.put("message", "Penalty points were successfully searched in DB");
+             return new ResponseEntity<>(response, HttpStatus.OK);
+         }catch(Exception e){
+             e.printStackTrace();
+             response.put("message", "An error occurred while processing the request.");
+             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+         }
     }
+
+    // 상세 조회
+    @GetMapping("/check/detail")
+    public ResponseEntity<Map<String, Object>> getPenaltyDetail(@RequestParam("userId") Long userId){
+        Map<String, Object> response = new HashMap<>();
+
+        try {
+            List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId);
+            response.put("penalty", penalties);
+            response.put("message", "Penalty points were successfully searched in DB");
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }catch(Exception e){
+            e.printStackTrace();
+            response.put("message", "An error occurred while processing the request.");
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
     // Penalty 추가 : 임시로 만들어 놓음

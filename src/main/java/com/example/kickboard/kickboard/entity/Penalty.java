@@ -18,7 +18,7 @@ public class Penalty {
     private Long id;
 
     @Column(name = "date", updatable= false)
-    @Temporal(TemporalType.TIMESTAMP)
+    @Temporal(TemporalType.DATE)
     private Date date;
 
     @Column(name = "content", updatable= false)
