@@ -1,5 +1,6 @@
 package com.example.kickboard.login.entity;
 
+import com.example.kickboard.login.validation.NoHyphen;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -23,6 +24,7 @@ public class User {
     private String nickname;
 
     @Column(name = "phone", nullable = false, unique= true)
+    @NoHyphen
     private String phone;
 
     @Column(name = "grade", nullable = false)

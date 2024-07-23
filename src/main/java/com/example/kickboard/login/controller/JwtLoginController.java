@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,22 +28,25 @@ public class JwtLoginController {
 
     @PostMapping("/join")
     public String join(@RequestBody JoinRequest joinRequest){
+
         // phone 중복 확인
         if(userService.checkPhoneDuplicate(joinRequest.getPhone())){
-            return "로그인 아이디가 중복됩니다.";
+            return "The phone number already exists";
+        }else if(joinRequest.getPhone().contains("-")){
+            throw new IllegalArgumentException("Phone number should not contain hyphens");
         }
         userService.join(joinRequest);
-        return "회원가입 성공";
+        return "Registration successful";
     }
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest loginRequest){
         User user = userService.login(loginRequest);
-        log.info("controller : " + secretKey);
-        log.info("controller : " + user);
-        // phone 틀린 경우
-        if(user == null){
-            return "등록되지 않은 전화번호입니다.";
+
+        if(loginRequest.getPhone().contains("-")){
+            throw new IllegalArgumentException("Phone number should not contain hyphens");
+        }else if(user == null) {    // 등록 안된 phone
+            return "Phone number is not registered";
         }
 
         // 로그인 성공 시, JWT TOKEN 발급
@@ -51,6 +55,11 @@ public class JwtLoginController {
         String jwtToken = JwtTokenUtil.createToken(user.getPhone(), secretKey, expireTimeMs);
 
         return jwtToken;
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException e) {
+        return ResponseEntity.badRequest().body(e.getMessage());
     }
 
     @GetMapping("/info")
