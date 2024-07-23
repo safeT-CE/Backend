@@ -24,17 +24,33 @@ public class PenaltyController {
     // 전체 조회
     @GetMapping("/check")
     public ResponseEntity<Map<String, Object>> checkPenalty(@RequestParam("userId") Long userId) {
+        List<Penalty> penalties = penaltyService.getPenaltiesByUserId(userId);
+        return createResponse(penalties, "All penalty information");
+    }
+
+    // 기본 조회
+    @GetMapping("/check/summary")
+    public ResponseEntity<Map<String, Object>> getPenaltySummaries(@RequestParam("userId") Long userId){
+        List<PenaltySummaryResponse> penalties = penaltyService.getPenaltySummaries(userId);
+        return createResponse(penalties, "penalty");
+    }
+
+    // 상세 조회
+    @GetMapping("/check/detail")
+    public ResponseEntity<Map<String, Object>> getPenaltyDetail(@RequestParam("userId") Long userId){
+        List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId);
+        return createResponse(penalties, "penalty");
+    }
+
+    private <T> ResponseEntity<Map<String, Object>> createResponse(List<T> penalties, String itemName) {
         Map<String, Object> response = new HashMap<>();
-
         try {
-            List<Penalty> penalties = penaltyService.getPenaltiesByUserId(userId);
-
             if (penalties.isEmpty()) {
-                response.put("message", "No penalty points found for the given userId.");
+                response.put("message", "No " + itemName + " points found for the given userId.");
                 return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
             }
-            response.put("data", penalties);
-            response.put("message", "Penalty points were successfully searched in DB");
+            response.put(itemName, penalties);
+            response.put("message", itemName + " points were successfully searched in DB");
             return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (Exception e) {
             e.printStackTrace();
@@ -43,43 +59,7 @@ public class PenaltyController {
         }
     }
 
-    // 기본 조회
-    @GetMapping("/check/summary")
-    public ResponseEntity<Map<String, Object>> getPenaltySummaries(@RequestParam("userId") Long userId){
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-             List<PenaltySummaryResponse> penalties = penaltyService.getPenaltySummaries(userId);
-             response.put("penalty", penalties);
-             response.put("message", "Penalty points were successfully searched in DB");
-             return new ResponseEntity<>(response, HttpStatus.OK);
-         }catch(Exception e){
-             e.printStackTrace();
-             response.put("message", "An error occurred while processing the request.");
-             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-         }
-    }
-
-    // 상세 조회
-    @GetMapping("/check/detail")
-    public ResponseEntity<Map<String, Object>> getPenaltyDetail(@RequestParam("userId") Long userId){
-        Map<String, Object> response = new HashMap<>();
-
-        try {
-            List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId);
-            response.put("penalty", penalties);
-            response.put("message", "Penalty points were successfully searched in DB");
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }catch(Exception e){
-            e.printStackTrace();
-            response.put("message", "An error occurred while processing the request.");
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-
-    // Penalty 추가 : 임시로 만들어 놓음
+    // Penalty 추가 : 수정 예정
     @PostMapping
     public ResponseEntity<?> createPenalty(@RequestParam("userId") Long userId, @RequestBody PenaltyRequest request) {
         try {
