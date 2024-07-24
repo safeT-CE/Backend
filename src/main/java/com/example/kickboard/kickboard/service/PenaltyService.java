@@ -30,6 +30,7 @@ public class PenaltyService {
 
     private final PenaltyRepository penaltyRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;  //
 
     @Value("${KAKAO_API_KEY}")
     private String apiKey;
@@ -37,10 +38,11 @@ public class PenaltyService {
     private final RestTemplate restTemplate;
 
     @Autowired
-    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository, RestTemplate restTemplate) {
+    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository, RestTemplate restTemplate, NotificationService notificationService) {
         this.penaltyRepository = penaltyRepository;
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
+        this.notificationService = notificationService; //
     }
 
     // 벌점 기록 전체 조회
@@ -107,7 +109,6 @@ public class PenaltyService {
 
             // 위도, 경도 -> 지번 주소 알아내기
             ResponseEntity<KakaoApiResponse> response = getAddressFromCoordinates(map.getLatitude(), map.getLongitude());
-
             String location = getLocation(response);
             penalty.setLocation(location);
 
@@ -117,7 +118,18 @@ public class PenaltyService {
             // count 필드 설정 (userId 기준)
             penalty.setCount((int) penaltyRepository.countByUserId(userId) + 1);
 
-            return penaltyRepository.save(penalty);
+            //
+            // 벌점 데이터베이스에 저장
+            Penalty savedPenalty = penaltyRepository.save(penalty);
+
+            // 벌점 등록 후 사용자에게 알림 전송
+            String message = request.getContent();
+            notificationService.notifyUser(userId, message);
+
+            return savedPenalty;
+            //
+
+            //return penaltyRepository.save(penalty);
         }catch (CustomException e){
             log.error("Error occurred while created Penalty : ", e);
             throw e;
