@@ -7,9 +7,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @Slf4j
@@ -20,6 +27,56 @@ public class FaceController {
     private FaceService faceService;
 
     // 앱에 자신의 면허증 - 얼굴 등록
+    @PostMapping("/upload")
+    public <T> ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("") MultipartFile licenseImage,
+                                             @RequestParam("") MultipartFile faceImage){
+        Map<String, Object> response = new HashMap<>();
+
+        Path temDir;
+        try{
+            temDir = Files.createTempDirectory("uploads");
+        }catch (IOException e){
+             e.printStackTrace();
+             response.put("message", "not found" + licenseImage + faceImage + "and temDir");
+             return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // 면허증, 얼굴 사진 저장
+        try{
+            File licenseFile = new File(temDir.toFile(), licenseImage.getOriginalFilename());
+            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
+
+            licenseImage.transferTo(licenseFile);
+            faceImage.transferTo(faceFile);
+
+            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/modify_picNface.py",
+                                                            licenseFile.getAbsolutePath(),
+                                                            faceFile.getAbsolutePath());
+
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+            int exitCode =  process.waitFor();
+
+            Files.delete(licenseFile.toPath());
+            Files.delete(faceFile.toPath());
+
+            if(exitCode == 0){
+                response.put("message", "success");
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else{
+                response.put("message", "Can't delete files");
+                return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
+            }
+
+        } catch (IOException | InterruptedException e){
+            e.printStackTrace();
+            response.put("message", "Exception occurred : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    // 삭제 가능
     @PostMapping("/first")
     public ResponseEntity<String> runPythonAndSaveCSV(@RequestParam("userId") Long userId) {
         try {
