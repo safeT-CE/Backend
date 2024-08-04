@@ -7,5 +7,9 @@ import java.util.List;
 
 public interface PenaltyRepository extends JpaRepository<Penalty, Long> {
      List<Penalty> findByUserId(Long userId);
+     List<Penalty> findByIdAndUserId(Long penaltyId, Long userId);
+
      long countByUserId(Long userId);
+
+     //void deleteByDateBefore(LocalDate date);
 }

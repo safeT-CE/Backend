@@ -19,6 +19,8 @@ import com.example.kickboard.kickboard.entity.PMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URL;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,17 +34,24 @@ public class PenaltyService {
     private final UserRepository userRepository;
     private final NotificationService notificationService;  //
 
+    private final S3Service s3Service;
+
     @Value("${KAKAO_API_KEY}")
     private String apiKey;
 
     private final RestTemplate restTemplate;
 
     @Autowired
-    public PenaltyService(PenaltyRepository penaltyRepository, UserRepository userRepository, RestTemplate restTemplate, NotificationService notificationService) {
+    public PenaltyService(PenaltyRepository penaltyRepository,
+                          UserRepository userRepository,
+                          RestTemplate restTemplate,
+                          NotificationService notificationService,
+                          S3Service s3Service) {
         this.penaltyRepository = penaltyRepository;
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
         this.notificationService = notificationService; //
+        this.s3Service = s3Service;
     }
 
     // 벌점 기록 전체 조회
@@ -66,9 +75,10 @@ public class PenaltyService {
     }
 
     @Transactional
-    public List<PenaltyDetailResponse> getPenaltyDetail(Long userId) {
-        List<Penalty> penalties = penaltyRepository.findByUserId(userId);
-        log.info("PenaltyService : " + userId);
+    public List<PenaltyDetailResponse> getPenaltyDetail(Long userId, Long penaltyId) {
+        log.info("PenaltyService : " + userId + ", " + penaltyId);
+        List<Penalty> penalties = penaltyRepository.findByIdAndUserId(penaltyId, userId);
+        log.info("PenaltyService : " + userId + ", " + penaltyId);
         return penalties.stream()
                 .map(penalty -> new PenaltyDetailResponse(
                         penalty.getContent(),
@@ -98,26 +108,26 @@ public class PenaltyService {
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
             Penalty penalty = new Penalty();
-            log.info("service ok1");
+
             // 추후에 Content, Photo, Map -> Location은 받아오는 형식으로 수정할 예정임.
             penalty.setContent(request.getContent());
             //penalty.setLocation(request.getLocation());
             penalty.setPhoto(request.getPhoto());
             penalty.setDate(request.getDate());
             penalty.setDetectionCount(request.getDetectionCount());
-            log.info("service ok2");
+
             Map<String, Object> mapData = request.getMap();
             PMap map = new PMap((Double) mapData.get("latitude"), (Double) mapData.get("longitude"));
             penalty.setMap(map);
-            log.info("service ok3");
+
             // 위도, 경도 -> 지번 주소 알아내기
             ResponseEntity<KakaoApiResponse> response = getAddressFromCoordinates(map.getLatitude(), map.getLongitude());
             String location = getLocation(response);
             penalty.setLocation(location);
-            log.info("service ok4");
+
             // user 최종 set
             penalty.setUser(user);
-            log.info("service ok5");
+
             // count 필드 설정 (userId 기준)
             penalty.setTotalCount((int) penaltyRepository.countByUserId(userId) + 1);
 
@@ -160,20 +170,26 @@ public class PenaltyService {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("x", longitude)
                 .queryParam("y", latitude);
-        log.info("kakao service ok1");
+
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + apiKey);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-        log.info("kakao service ok2");
+
         ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
                 entity,
                 KakaoApiResponse.class
         );
-
-        log.info("PenaltyService : " + response.getBody());
+        //log.info("PenaltyService : " + response.getBody());
         return response;
     }
+
+    // 7일 후 자동 삭제 - 지금 date가 localDate type이 아니라서 못함.
+//    @Scheduled(cron = "0 0 0 * * ?")    // 매일 자정
+//    @Transactional
+//    public void deleteRecords(){
+//        penaltyRepository.deleteByDateBefore(LocalDate.now().minusDays(1));   // 1일
+//    }
 }

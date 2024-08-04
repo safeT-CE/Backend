@@ -21,3 +21,16 @@ spring:
         cache-duration: PT1H
 server:
     port: 8080
+cloud:
+    aws:
+        credentials:
+            accessKey: ${AWS_ACCESS_KEY}
+            secretKey: ${AWS_SECRET_KEY}
+        region:
+            static: ${AWS_REGION}
+        stack:
+            auto: false
+
+application:
+    bucket:
+        name: ${AWS_BUCKET_NAME}
