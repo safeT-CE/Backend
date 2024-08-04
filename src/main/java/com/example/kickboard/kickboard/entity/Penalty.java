@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
 
 @Entity
 @Getter
@@ -17,7 +20,7 @@ public class Penalty {
     private Long id;
 
     @Column(name = "date", updatable= false)
-    private String date;
+    private LocalDateTime date;
 
     @Column(name = "content", updatable= false)
     private String content;

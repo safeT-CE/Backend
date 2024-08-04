@@ -42,5 +42,4 @@ public class S3Service {
             throw new RuntimeException("Failed to upload file to S3", e);
         }
     }
-
 }

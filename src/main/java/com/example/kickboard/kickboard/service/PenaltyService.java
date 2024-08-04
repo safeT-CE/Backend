@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import com.example.kickboard.kickboard.entity.PMap;
@@ -21,6 +22,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URL;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -111,10 +114,14 @@ public class PenaltyService {
 
             // 추후에 Content, Photo, Map -> Location은 받아오는 형식으로 수정할 예정임.
             penalty.setContent(request.getContent());
-            //penalty.setLocation(request.getLocation());
+            //penalty.setDate(request.getDate());
             penalty.setPhoto(request.getPhoto());
-            penalty.setDate(request.getDate());
             penalty.setDetectionCount(request.getDetectionCount());
+
+            // 날짜
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분");
+            LocalDateTime localDate = LocalDateTime.parse(request.getDate(), formatter);
+            penalty.setDate(localDate);
 
             Map<String, Object> mapData = request.getMap();
             PMap map = new PMap((Double) mapData.get("latitude"), (Double) mapData.get("longitude"));
@@ -186,10 +193,20 @@ public class PenaltyService {
         return response;
     }
 
-    // 7일 후 자동 삭제 - 지금 date가 localDate type이 아니라서 못함.
-//    @Scheduled(cron = "0 0 0 * * ?")    // 매일 자정
-//    @Transactional
-//    public void deleteRecords(){
-//        penaltyRepository.deleteByDateBefore(LocalDate.now().minusDays(1));   // 1일
-//    }
+    //@Scheduled(fixedRate = 60000)  // 매 5분마다 실행 : 테스트용
+    @Scheduled(cron = "0 0 0 * * ?")    // 매일 자정
+    @Transactional
+    public void deleteRecords(){
+        log.info("Starting scheduled task: deleteRecords");
+        //penaltyRepository.deleteByDateBefore(LocalDateTime.now().minusDays(7));   // 7일
+
+        //LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5); // 테스트용
+        LocalDateTime cutoffTime = LocalDateTime.now().minusDays(7); // 7일
+
+        // 데이터베이스 레코드 삭제
+        penaltyRepository.deleteByDateBefore(cutoffTime);
+
+        // S3 파일 삭제
+        //s3Service.deleteOldFiles(cutoffTime);
+    }
 }
