@@ -18,15 +18,14 @@ public class Penalty {
     private Long id;
 
     @Column(name = "date", updatable= false)
-    @Temporal(TemporalType.DATE)
-    private Date date;
+    private String date;
 
     @Column(name = "content", updatable= false)
     private String content;
 
     // 이건 삭제 가능성
     @Column(name = "count", updatable= false)
-    private int count;
+    private int totalCount;
 
     // 증거 사진 : url
     @Column(name = "photo", updatable= false)
@@ -40,12 +39,15 @@ public class Penalty {
     @Embedded
     private PMap map;
 
+    @Column(name = "detectionCount", updatable = false)
+    private int detectionCount;
+
     @ManyToOne
     @JoinColumn(name = "id")
     private User user;
 
-    @PrePersist
-    protected void onCreate() {
-        date = new Date();
-    }
+//    @PrePersist
+//    protected void onCreate() {
+//        date = new Date();
+//    }
 }

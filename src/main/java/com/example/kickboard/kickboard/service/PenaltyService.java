@@ -59,7 +59,7 @@ public class PenaltyService {
                 .map(penalty -> new PenaltySummaryResponse(
                         penalty.getContent(),
                         penalty.getDate(),
-                        penalty.getCount(),
+                        penalty.getTotalCount(),
                         convertPMapToMap(penalty.getMap())
                 ))
                 .collect(Collectors.toList());
@@ -73,10 +73,11 @@ public class PenaltyService {
                 .map(penalty -> new PenaltyDetailResponse(
                         penalty.getContent(),
                         penalty.getDate(),
-                        penalty.getCount(),
+                        penalty.getTotalCount(),
                         penalty.getLocation(),
                         convertPMapToMap(penalty.getMap()),
-                        penalty.getPhoto()
+                        penalty.getPhoto(),
+                        penalty.getDetectionCount()
                 ))
                 .collect(Collectors.toList());
     }
@@ -97,26 +98,28 @@ public class PenaltyService {
         try {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
             Penalty penalty = new Penalty();
-
+            log.info("service ok1");
             // 추후에 Content, Photo, Map -> Location은 받아오는 형식으로 수정할 예정임.
             penalty.setContent(request.getContent());
-            penalty.setLocation(request.getLocation());
+            //penalty.setLocation(request.getLocation());
             penalty.setPhoto(request.getPhoto());
-
+            penalty.setDate(request.getDate());
+            penalty.setDetectionCount(request.getDetectionCount());
+            log.info("service ok2");
             Map<String, Object> mapData = request.getMap();
             PMap map = new PMap((Double) mapData.get("latitude"), (Double) mapData.get("longitude"));
             penalty.setMap(map);
-
+            log.info("service ok3");
             // 위도, 경도 -> 지번 주소 알아내기
             ResponseEntity<KakaoApiResponse> response = getAddressFromCoordinates(map.getLatitude(), map.getLongitude());
             String location = getLocation(response);
             penalty.setLocation(location);
-
+            log.info("service ok4");
             // user 최종 set
             penalty.setUser(user);
-
+            log.info("service ok5");
             // count 필드 설정 (userId 기준)
-            penalty.setCount((int) penaltyRepository.countByUserId(userId) + 1);
+            penalty.setTotalCount((int) penaltyRepository.countByUserId(userId) + 1);
 
             //
             // 벌점 데이터베이스에 저장
@@ -157,12 +160,12 @@ public class PenaltyService {
         UriComponentsBuilder uriBuilder = UriComponentsBuilder.fromHttpUrl(url)
                 .queryParam("x", longitude)
                 .queryParam("y", latitude);
-
+        log.info("kakao service ok1");
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "KakaoAK " + apiKey);
 
         HttpEntity<String> entity = new HttpEntity<>(headers);
-
+        log.info("kakao service ok2");
         ResponseEntity<KakaoApiResponse> response = restTemplate.exchange(
                 uriBuilder.toUriString(),
                 HttpMethod.GET,
@@ -170,7 +173,7 @@ public class PenaltyService {
                 KakaoApiResponse.class
         );
 
-        //log.info("PenaltyService : " + response.getBody());
+        log.info("PenaltyService : " + response.getBody());
         return response;
     }
 }

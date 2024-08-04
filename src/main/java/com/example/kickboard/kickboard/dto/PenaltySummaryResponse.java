@@ -11,14 +11,14 @@ import java.util.Map;
 @Setter
 public class PenaltySummaryResponse {
     private String content;
-    private Date date;
-    private int count;
+    private String date;
+    private int totalCount;
     private Map<String, Object> map;
 
-    public PenaltySummaryResponse(String content, Date date, int count, Map<String, Object> map) {
+    public PenaltySummaryResponse(String content, String date, int totalCount, Map<String, Object> map) {
         this.content = content;
         this.date = date;
-        this.count = count;
+        this.totalCount = totalCount;
         this.map = map;
     }
 }

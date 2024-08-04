@@ -10,7 +10,9 @@ import java.util.Map;
 public class PenaltyRequest {
     private String content;
     private String photo;
+    private String date;
     private String location;
     private Map<String, Object> map;
+    private int detectionCount;
 }
 
