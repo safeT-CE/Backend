@@ -47,9 +47,4 @@ public class Penalty {
     @ManyToOne
     @JoinColumn(name = "id")
     private User user;
-
-//    @PrePersist
-//    protected void onCreate() {
-//        date = new Date();
-//    }
 }

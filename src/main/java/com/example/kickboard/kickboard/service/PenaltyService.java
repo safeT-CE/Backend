@@ -20,8 +20,6 @@ import com.example.kickboard.kickboard.entity.PMap;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.net.URL;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -193,20 +191,26 @@ public class PenaltyService {
         return response;
     }
 
+    // Penalty 내역 자동 삭제
     //@Scheduled(fixedRate = 60000)  // 매 5분마다 실행 : 테스트용
     @Scheduled(cron = "0 0 0 * * ?")    // 매일 자정
     @Transactional
     public void deleteRecords(){
         log.info("Starting scheduled task: deleteRecords");
-        //penaltyRepository.deleteByDateBefore(LocalDateTime.now().minusDays(7));   // 7일
 
         //LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5); // 테스트용
         LocalDateTime cutoffTime = LocalDateTime.now().minusDays(7); // 7일
+
+        // aws s3 삭제 데이터 리스트
+        List<String> deletePhoto = penaltyRepository.findIdPhotoDateBefore(cutoffTime);
 
         // 데이터베이스 레코드 삭제
         penaltyRepository.deleteByDateBefore(cutoffTime);
 
         // S3 파일 삭제
-        //s3Service.deleteOldFiles(cutoffTime);
+        if(deletePhoto != null && !deletePhoto.isEmpty()){
+            for(String url : deletePhoto)
+                s3Service.deleteImage(url);
+        }
     }
 }
