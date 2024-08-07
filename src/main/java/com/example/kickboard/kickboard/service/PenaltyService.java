@@ -110,9 +110,7 @@ public class PenaltyService {
             User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("Invalid user ID"));
             Penalty penalty = new Penalty();
 
-            // 추후에 Content, Photo, Map -> Location은 받아오는 형식으로 수정할 예정임.
             penalty.setContent(request.getContent());
-            //penalty.setDate(request.getDate());
             penalty.setPhoto(request.getPhoto());
             penalty.setDetectionCount(request.getDetectionCount());
 
@@ -136,7 +134,7 @@ public class PenaltyService {
             // count 필드 설정 (userId 기준)
             penalty.setTotalCount((int) penaltyRepository.countByUserId(userId) + 1);
 
-            //
+            // 알림 기능 - 진행 중
             // 벌점 데이터베이스에 저장
             Penalty savedPenalty = penaltyRepository.save(penalty);
 
@@ -145,9 +143,6 @@ public class PenaltyService {
             notificationService.notifyUser(userId, message);
 
             return savedPenalty;
-            //
-
-            //return penaltyRepository.save(penalty);
         }catch (CustomException e){
             log.error("Error occurred while created Penalty : ", e);
             throw e;

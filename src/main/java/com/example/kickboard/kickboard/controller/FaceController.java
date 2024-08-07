@@ -2,6 +2,7 @@ package com.example.kickboard.kickboard.controller;
 
 
 import com.example.kickboard.kickboard.service.FaceService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,9 +28,11 @@ public class FaceController {
     private FaceService faceService;
 
     // 앱에 자신의 면허증 - 얼굴 등록
-    @PostMapping("/upload")
-    public <T> ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("") MultipartFile licenseImage,
-                                             @RequestParam("") MultipartFile faceImage){
+    @GetMapping("/upload")
+    public <T> ResponseEntity<Map<String, Object>> uploadFile(
+                                            @RequestParam("userId") Long userId,
+                                            @RequestParam("licenseImage") MultipartFile licenseImage,
+                                            @RequestParam("faceImage") MultipartFile faceImage){
         Map<String, Object> response = new HashMap<>();
 
         Path temDir;
@@ -49,23 +52,42 @@ public class FaceController {
             licenseImage.transferTo(licenseFile);
             faceImage.transferTo(faceFile);
 
-            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/modify_picNface.py",
+            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/test.py",
                                                             licenseFile.getAbsolutePath(),
-                                                            faceFile.getAbsolutePath());
+                                                            faceFile.getAbsolutePath(),
+                                                            String.valueOf(userId));
 
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
+
+
+            // Python 스크립트의 출력 읽기
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                    //output.append(line);
+                }
+            }
+
             int exitCode =  process.waitFor();
 
             Files.delete(licenseFile.toPath());
             Files.delete(faceFile.toPath());
 
             if(exitCode == 0){
+                String identity = output.toString().trim();
+
+                // 응답
                 response.put("message", "success");
+                response.put("identity", identity);
+                faceService.saveIdentity(userId, identity);
+
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else{
-                response.put("message", "Can't delete files");
+                response.put("message", "Can't store the CSV file");
                 return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
             }
 
@@ -76,44 +98,62 @@ public class FaceController {
         }
     }
 
-    // 삭제 가능
-    @PostMapping("/first")
-    public ResponseEntity<String> runPythonAndSaveCSV(@RequestParam("userId") Long userId) {
-        try {
-            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/picNface.py");
+    // 테스트용
+    @GetMapping("/upload/test")
+    public <T> ResponseEntity<Map<String, Object>> uploadTestFile(
+            @RequestParam("userId") Long userId){
+        Map<String, Object> response = new HashMap<>();
+
+        Path temDir;
+        try{
+            temDir = Files.createTempDirectory("uploads");
+        }catch (IOException e){
+            e.printStackTrace();
+            //response.put("message", "not found" + licenseImage + faceImage + "and temDir");
+            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+        }
+
+        // 면허증, 얼굴 사진 저장
+        try{
+            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/test.py",
+                    String.valueOf(userId));
+
+            pb.redirectErrorStream(true);
+
             Process process = pb.start();
 
-            // 표준 출력 및 오류 읽기
-            BufferedReader stdInput = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader stdError = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
+            // Python 스크립트의 출력 읽기
             StringBuilder output = new StringBuilder();
-            StringBuilder errorOutput = new StringBuilder();
-            String line;
-
-            // 표준 출력 읽기
-            while ((line = stdInput.readLine()) != null) {
-                output.append(line).append("\n");
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line); //.append("\n");
+                    //output.append(line);
+                }
             }
 
-            // 표준 오류 읽기
-            while ((line = stdError.readLine()) != null) {
-                errorOutput.append(line).append("\n");
+            int exitCode =  process.waitFor();
+            if(exitCode == 0){
+                String identity = output.toString().trim();
+                log.info("FaceController : 1"); //
+                log.info("FaceController : " + identity);
+
+                // 처리된 JSON 응답
+                response.put("message", "success");
+                response.put("identity", identity);
+                faceService.saveIdentity(userId, identity);  // 저장 로직에 JSON 응답 전달
+                log.info("FaceController : 2"); //
+
+                return new ResponseEntity<>(response, HttpStatus.OK);
+            } else{
+                response.put("message", "Can't store the CSV file");
+                return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
             }
 
-            // Python 스크립트 실행 대기
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                // CSV 파일을 데이터베이스에 저장
-                faceService.saveCSVToDatabase("C:/Users/SAMSUNG/Desktop/FaceRecognition_JE/face_rec_data/face_features_output.csv", userId);
-                return ResponseEntity.ok("CSV file processed and data saved to database.");
-            } else {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Python script execution failed");
-            }
-
-        } catch (Exception e) {
+        } catch (IOException | InterruptedException e){
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Exception occurred: " + e.getMessage());
+            response.put("message", "Exception occurred : " + e.getMessage());
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
