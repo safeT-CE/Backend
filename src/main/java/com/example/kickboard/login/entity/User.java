@@ -48,7 +48,7 @@ public class User {
     private String face;
 
     // identity : csv 저장 위치가 기록됨.
-    @Column(name = "identity", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'x'")
+    @Column(name = "identity", columnDefinition = "VARCHAR(255)")
     private String identity;
 
 }

@@ -15,6 +15,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Query("SELECT u.ticket FROM User u WHERE u.id = :id")
     Boolean findTicketById(@Param("id") Long id);
 
+    @Query("SELECT u.identity FROM User u WHERE u.id = :id")
+    String findIdentityById(@Param("id") Long id);
+
     @Modifying
     @Query("UPDATE User u SET u.ticket = :ticket WHERE u.id = :id")
     void updateTicketStatus(@Param("id") Long id, @Param("ticket") boolean ticket);
