@@ -21,7 +21,7 @@ public class FaceService {
 
     @Transactional
     public void saveIdentity(Long userId, FaceRequest request) {
-        if (userId == request.getUserId()) {
+        if (userId != null && userId.equals(request.getUserId())) {
             String currentIdentity = userRepository.findIdentityById(userId);
             if(currentIdentity!= null && !currentIdentity.isBlank()){ // 재등록할 경우
                 s3Service.deleteImage(currentIdentity);
