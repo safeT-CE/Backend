@@ -21,14 +21,15 @@ public class FaceService {
 
     @Transactional
     public void saveIdentity(Long userId, FaceRequest request) {
+        String currentIdentity = userRepository.findIdentityById(userId);
         if (userId != null && userId.equals(request.getUserId())) {
-            String currentIdentity = userRepository.findIdentityById(userId);
             if(currentIdentity!= null && !currentIdentity.isBlank()){ // 재등록할 경우
                 s3Service.deleteImage(currentIdentity);
             }
             // userId로 찾은 user의 idenetity 데이터를 넣기
             userRepository.updateIdentityStatus(userId, request.getIdentity());
-        } else {
+        } else { // CSV 경로 전송 실패 시
+            s3Service.deleteImage(currentIdentity);
             throw new UserIdNotFoundException("The UserId in the request doesn't match the UserId in the response.");
         }
     }

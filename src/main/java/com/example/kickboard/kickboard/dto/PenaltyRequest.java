@@ -9,6 +9,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class PenaltyRequest {
+
+    private String userId;
     private String content;
     private String photo;
     private String date;    // string으로 받음
