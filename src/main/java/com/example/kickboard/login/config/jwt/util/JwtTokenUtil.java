@@ -16,7 +16,7 @@ public class JwtTokenUtil {
         // Claim = Jwt Token에 들어갈 정보 : Claim에 loginId를 넣어 줌으로써 나중에 loginId를 꺼낼 수 있음
         Claims claims = Jwts.claims();
         claims.put("phone", phone);
-        log.info("jwtTokenutil : " + phone);
+        log.info("createToken : " + phone);
 
         return Jwts.builder()
                 .setClaims(claims)

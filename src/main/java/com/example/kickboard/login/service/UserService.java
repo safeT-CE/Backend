@@ -46,7 +46,7 @@ public class UserService {
      */
     public User login(LoginRequest req) {
         Optional<User> optionalUser = userRepository.findByPhone(req.getPhone());
-        log.info("service : " + req.getPhone());
+        log.info("login : " + req.getPhone());
         // loginId와 일치하는 User가 없으면 null return
         if(optionalUser.isEmpty()) {
             return null;

@@ -69,6 +69,7 @@ public class PenaltyService {
                 .map(penalty -> new PenaltySummaryResponse(
                         penalty.getContent(),
                         penalty.getDate(),
+                        penalty.getPhoto(),
                         penalty.getTotalCount(),
                         convertPMapToMap(penalty.getMap())
                 ))
