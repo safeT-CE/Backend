@@ -10,6 +10,8 @@ import java.util.Map;
 @Getter
 @Setter
 public class PenaltyDetailResponse {
+
+    private Long penaltyId;
     private String content;
     private LocalDateTime date;
     private int totalCount;
@@ -22,13 +24,15 @@ public class PenaltyDetailResponse {
 
     // 추후 이용 시간 추가
 
-    public PenaltyDetailResponse(String content,
+    public PenaltyDetailResponse(Long penaltyId,
+                                 String content,
                                  LocalDateTime date,
                                  int totalCount,
                                  String location,
                                  Map<String, Object> map,
                                  String photo,
                                  int detectionCount) {
+        this.penaltyId = penaltyId;
         this.content = content;
         this.date = date;
         this.totalCount = totalCount;

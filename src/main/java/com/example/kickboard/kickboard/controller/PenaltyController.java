@@ -36,13 +36,12 @@ public class PenaltyController {
     }
 
     // 상세 조회
-    @GetMapping("/check/detail")
+    @GetMapping(value = "/check/detail", produces = "application/json; charset=UTF-8")
     public ResponseEntity<Map<String, Object>> getPenaltyDetail(@RequestParam("userId") Long userId, @RequestParam("penaltyId")Long penaltyId) {
         List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId, penaltyId);
         //List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId);
         return createResponse(penalties, "penalty");
     }
-
 
 
     private <T> ResponseEntity<Map<String, Object>> createResponse(List<T> penalties, String itemName) {

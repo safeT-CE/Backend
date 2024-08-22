@@ -67,6 +67,7 @@ public class PenaltyService {
         List<Penalty> penalties = penaltyRepository.findByUserId(userId);
         return penalties.stream()
                 .map(penalty -> new PenaltySummaryResponse(
+                        penalty.getId(),
                         penalty.getContent(),
                         penalty.getDate(),
                         penalty.getPhoto(),
@@ -83,6 +84,7 @@ public class PenaltyService {
         log.info("PenaltyService : " + userId + ", " + penaltyId);
         return penalties.stream()
                 .map(penalty -> new PenaltyDetailResponse(
+                        penalty.getId(),
                         penalty.getContent(),
                         penalty.getDate(),
                         penalty.getTotalCount(),
