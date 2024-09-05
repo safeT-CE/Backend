@@ -4,7 +4,7 @@ package com.example.kickboard.kickboard.controller;
 import com.example.kickboard.kickboard.dto.ProfileResponse;
 import com.example.kickboard.kickboard.service.ProfileService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
+@Slf4j
 @RequestMapping(value="/profile")
 public class ProfileController {
 
@@ -30,7 +31,9 @@ public class ProfileController {
         response.put("grade", profile.getGrade());
         response.put("point", profile.getPoint());
         response.put("useTime", profile.getUseTime());
-        // 필요한 다른 정보를 추가할 수 있습니다.
+
+        log.info("profileService : ", id);
+        log.info("phone : ", profile.getPhone());
 
         // ResponseEntity에 Map을 담아서 반환
         return ResponseEntity.ok(response);
