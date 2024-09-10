@@ -4,7 +4,9 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureException;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class JwtUtil {
     private String secretKey;
 
@@ -18,15 +20,15 @@ public class JwtUtil {
             return true; // 유효한 경우
         } catch (SignatureException e) {
             // 서명 불일치
-            System.out.println("Invalid JWT signature: " + e.getMessage());
+            log.debug("Invalid JWT signature: " + e.getMessage());
             return false;
         } catch (ExpiredJwtException e) {
             // 토큰 만료
-            System.out.println("JWT token is expired: " + e.getMessage());
+            log.debug("JWT token is expired: " + e.getMessage());
             return false;
         } catch (Exception e) {
             // 기타 예외
-            System.out.println("Invalid JWT token: " + e.getMessage());
+            log.debug("Invalid JWT token: " + e.getMessage());
             return false;
         }
     }
