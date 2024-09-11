@@ -1,0 +1,53 @@
+package com.example.safeT.kickboard.controller;
+
+import com.example.safeT.kickboard.entity.Inquiry;
+import com.example.safeT.kickboard.service.InquiryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/inquiries")
+public class InquiryController {
+
+    @Autowired
+    private InquiryService inquiryService;
+
+    // 사용자 ID로 개인 문의 사항 조회
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Inquiry>> getInquiriesByUserId(@PathVariable Long userId) {
+        List<Inquiry> inquiries = inquiryService.getInquiriesByUserId(userId);
+        return ResponseEntity.ok(inquiries);
+    }
+
+    // 개인 문의 글쓰기
+    @PostMapping
+    public ResponseEntity<Inquiry> createInquiry(@RequestBody Inquiry inquiry) {
+        Inquiry createdInquiry = inquiryService.createInquiry(inquiry);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdInquiry);
+    }
+
+    // 개인 문의 상세 조회
+    @GetMapping("/{id}")
+    public ResponseEntity<Inquiry> getInquiryById(@PathVariable Long id) {
+        Inquiry inquiry = inquiryService.getInquiryById(id);
+        return inquiry != null ? ResponseEntity.ok(inquiry) : ResponseEntity.notFound().build();
+    }
+
+    // 개인 문의 수정
+    @PutMapping("/{id}")
+    public ResponseEntity<Inquiry> updateInquiry(@PathVariable Long id, @RequestBody Inquiry updatedInquiry) {
+        Inquiry inquiry = inquiryService.updateInquiry(id, updatedInquiry);
+        return inquiry != null ? ResponseEntity.ok(inquiry) : ResponseEntity.notFound().build();
+    }
+
+    // 관리자 문의 답변 추가
+    @PostMapping("/{id}/response")
+    public ResponseEntity<Inquiry> respondToInquiry(@PathVariable Long id, @RequestBody String response) {
+        Inquiry updatedInquiry = inquiryService.respondToInquiry(id, response);
+        return updatedInquiry != null ? ResponseEntity.ok(updatedInquiry) : ResponseEntity.notFound().build(); // 문의가 존재하지 않을 시 404 Not Found 응답 반환
+    }
+}

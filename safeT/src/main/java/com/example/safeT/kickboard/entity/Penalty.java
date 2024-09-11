@@ -1,0 +1,49 @@
+package com.example.safeT.kickboard.entity;
+
+import com.example.safeT.login.entity.User;
+import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.time.LocalDateTime;
+
+
+@Entity
+@Getter
+@Setter
+public class Penalty {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "penaltyId", updatable= false)
+    private Long id;
+
+    @Column(name = "date", updatable= false)
+    private LocalDateTime date;
+
+    @Column(name = "content", updatable= false)
+    private String content;
+
+    // 이건 삭제 가능성
+    @Column(name = "count", updatable= false)
+    private int totalCount;
+
+    // 증거 사진 : url
+    @Column(name = "photo", updatable= false)
+    private String photo;
+
+    // 지번 주소
+    @Column(name = "location", updatable= false)
+    private String location;
+
+    // 위도, 경도
+    @Embedded
+    private PMap map;
+
+    @Column(name = "detectionCount", updatable = false)
+    private int detectionCount;
+
+    @ManyToOne
+    @JoinColumn(name = "id")
+    private User user;
+}
