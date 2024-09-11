@@ -1,44 +1,4 @@
 package com.example.safeT.kickboard.entity;
-//
-//import jakarta.persistence.*;
-//import java.time.LocalDateTime;
-//import lombok.Getter;
-//import lombok.Setter;
-//@Getter
-//@Setter
-//@Entity
-//@Table(name = "inquiries")
-//public class Inquiry {
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    private Long id;
-//
-//    @Column(nullable = false)
-//    private Long userId;  // 문의를 남긴 사용자의 ID
-//
-//    @Column(nullable = false)
-//    private String subject;
-//
-//    @Column(nullable = false, length = 2000)
-//    private String message;
-//
-//    @Column(nullable = false)
-//    private LocalDateTime createdAt;
-//
-//    @Column(nullable = true)
-//    private LocalDateTime respondedAt;
-//
-//    @Column(nullable = true)
-//    private String response;
-//
-//
-//    public LocalDateTime getUpdatedAt() {
-//        return updatedAt;
-//    }
-//    public void setUpdatedAt(LocalDateTime updatedAt) {
-//        this.updatedAt = updatedAt;
-//    }
-//}
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -57,7 +17,7 @@ public class Inquiry {
     private Long id;
 
     @Column(nullable = false)
-    private Long userId;
+    private Long userId; // 문의하기 남긴 유저 아이디
 
     @Column(nullable = false)
     private String subject;

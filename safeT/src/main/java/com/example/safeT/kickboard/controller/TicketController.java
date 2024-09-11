@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @Slf4j
 @RequestMapping(value = "/ticket")
@@ -35,7 +35,7 @@ public class TicketController {
         }
     }
 
-    @PostMapping("")
+    @PostMapping("/update")
     public ResponseEntity<Map<String, Object>> changeTicketStatus(@RequestBody TicketRequest request){
         try {
             ticketService.buyTicket(request.getUserId());
