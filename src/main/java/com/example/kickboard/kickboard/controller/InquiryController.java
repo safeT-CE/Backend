@@ -16,7 +16,7 @@ public class InquiryController {
     @Autowired
     private InquiryService inquiryService;
 
-    // 개인 문의 사항 조회
+    // 사용자 ID로 개인 문의 사항 조회
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<Inquiry>> getInquiriesByUserId(@PathVariable Long userId) {
         List<Inquiry> inquiries = inquiryService.getInquiriesByUserId(userId);
@@ -42,5 +42,12 @@ public class InquiryController {
     public ResponseEntity<Inquiry> updateInquiry(@PathVariable Long id, @RequestBody Inquiry updatedInquiry) {
         Inquiry inquiry = inquiryService.updateInquiry(id, updatedInquiry);
         return inquiry != null ? ResponseEntity.ok(inquiry) : ResponseEntity.notFound().build();
+    }
+
+    // 관리자 문의 답변 추가
+    @PostMapping("/{id}/response")
+    public ResponseEntity<Inquiry> respondToInquiry(@PathVariable Long id, @RequestBody String response) {
+        Inquiry updatedInquiry = inquiryService.respondToInquiry(id, response);
+        return updatedInquiry != null ? ResponseEntity.ok(updatedInquiry) : ResponseEntity.notFound().build(); // 문의가 존재하지 않을 시 404 Not Found 응답 반환
     }
 }

@@ -81,6 +81,6 @@ repositories {
 }
 
 // oauth2 과정에서 추가함
-//tasks.withType(JavaCompile) {
-//	options.compilerArgs << "-parameters"
-//}
+tasks.withType(JavaCompile) {
+	options.compilerArgs << "-parameters"
+}
