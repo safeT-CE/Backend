@@ -1,4 +1,4 @@
-package com.example.safeT.sms;
+package com.example.safeT;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
