@@ -48,9 +48,8 @@ dependencies {
 	// sms
 	implementation 'net.nurigo:sdk:4.3.0'
 
-	//
+	// xml
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'
-
 
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
