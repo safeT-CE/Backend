@@ -27,18 +27,28 @@ public class JwtLoginController {
     @Value("${JWT_SECRET}")
     private String secretKey;
 
+    // 전화번호 유효성 검사
+    @GetMapping("/phone")
+    public String checkPhone(@RequestParam("phone") String phone){
+        // phone 중복 확인
+        if(userService.checkPhoneDuplicate(phone)){
+            // return "The phone number already exists";
+            return "이미 등록된 전화번호입니다.";
+        } else if(phone.contains("-")){
+            //return "Phone number should not contain hyphens";
+            return "전화번호에 하이픈을 포함할 수 없습니다.";
+        } else if(!userService.checkphoneType(phone)){
+            //return "Invalid phone number format";
+            return "유효하지 않은 전화번호 형식입니다.";
+        }
+        return "Registrationable Number";
+    }
+
     // 회원가입
     @PostMapping("/join")
-    public String join(@RequestBody JoinRequest joinRequest){
-
-        // phone 중복 확인
-        if(userService.checkPhoneDuplicate(joinRequest.getPhone())){
-            return "The phone number already exists";
-        }else if(joinRequest.getPhone().contains("-")){
-            throw new IllegalArgumentException("Phone number should not contain hyphens");
-        }
-        userService.join(joinRequest);
-        return "Registration successful";
+    public Long join(@RequestBody JoinRequest joinRequest){
+        Long userId = userService.join(joinRequest);
+        return userId;
     }
 
     // 로그인

@@ -47,6 +47,8 @@ dependencies {
 
 	// sms
 	implementation 'net.nurigo:sdk:4.3.0'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	implementation 'org.springframework.session:spring-session-data-redis'
 
 	//
 	implementation 'javax.xml.bind:jaxb-api:2.3.1'

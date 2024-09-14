@@ -44,11 +44,12 @@ public class User {
     @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00:00'")
     private LocalTime useTime;
 
-    @Column(name = "face", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'b'")
-    private String face;
-
     // identity : csv 저장 위치가 기록됨.
     @Column(name = "identity", columnDefinition = "VARCHAR(255)")
     private String identity;
+
+    @Column(name = "samePerson")
+    private String samePerson;
+
 
 }

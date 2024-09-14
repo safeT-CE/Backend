@@ -73,80 +73,45 @@ public class FaceController {
             while ((line = errorReader.readLine()) != null) {
                 System.err.println("Python error: " + line);
             }
-
             //
+
             int exitCode =  process.waitFor();
+            log.info("faceController1 : {}", userId);
+            String samePerson = faceService.detectFace(userId);
+            log.info("faceController2 : {}", samePerson);
 
             // 얼굴, 신분증 사진 삭제
             Files.delete(licenseFile.toPath());
             Files.delete(faceFile.toPath());
 
+            faceService.checkSamePerson(samePerson);
             if(exitCode == 0){
-                response.put("message", "success");
-                log.info("faceController1");
+                response.put("samePerson", samePerson);
                 return new ResponseEntity<>(response, HttpStatus.OK);
             } else{
-                response.put("message", "Can't store the CSV file");
-                log.info("faceController2");
+                //response.put("message", "Can't store the CSV file");
+                response.put("samePerson", samePerson);
                 return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
             }
         } catch (IOException | InterruptedException e){
             e.printStackTrace();
-            log.info("faceController3");
-            response.put("message", "Exception occurred : " + e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    // 테스트용 [앱에 자신의 면허증 - 얼굴 등록]
-    @GetMapping("/upload/test")
-    public <T> ResponseEntity<Map<String, Object>> startTestFile(
-            @RequestParam("userId") Long userId){
-        Map<String, Object> response = new HashMap<>();
-
-        Path temDir;
-        try{
-            temDir = Files.createTempDirectory("uploads");
-        }catch (IOException e){
-            e.printStackTrace();
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
-
-        // 면허증, 얼굴 동일성 확인
-        try{
-            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/test.py",
-                    String.valueOf(userId));
-
-            pb.redirectErrorStream(true);
-            Process process = pb.start();
-            
-            int exitCode =  process.waitFor();
-            if(exitCode == 0){
-                response.put("message", "success");
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else{
-                response.put("message", "Can't store the CSV file");
-                return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
-            }
-        } catch (IOException | InterruptedException e){
-            e.printStackTrace();
-            response.put("message", "Exception occurred : " + e.getMessage());
+            response.put("samePerson", "server error");
+            //response.put("message", "Exception occurred : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // AWS S3에 저장된 csv 경로 받기
-    @PostMapping("/upload")
-    public ResponseEntity<Map<String, Object>>  uploadTestFile(@RequestParam("userId") Long userId, @RequestBody FaceRequest request){
+    @PostMapping("/upload/{userId}")
+    public ResponseEntity<Map<String, Object>>  uploadTestFile(@PathVariable("userId") String userId, @RequestBody FaceRequest request){
         try{
             faceService.saveIdentity(userId, request);
-            log.info("faceController4");
+            log.info("faceController uploadTestFile2 : {}", userId);
             Map<String, Object> response = new HashMap<>();
             response.put("userId", request.getUserId());
             response.put("identity", request.getIdentity());
             return ResponseEntity.ok(response);
         }catch (IllegalArgumentException e){
-            log.info("faceController5");
             return ResponseEntity.status(500).body(Map.of("error", "Failed to register Identity to " + userId));
         }
     }

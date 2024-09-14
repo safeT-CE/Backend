@@ -7,7 +7,7 @@ import com.example.kickboard.login.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
+import java.util.regex.Pattern;
 import org.springframework.stereotype.Service;
 
 
@@ -20,6 +20,7 @@ import java.util.Optional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private static final String PHONE_REGEX = "^(01[016789])(\\d{4})(\\d{4})$|^(01[016789])\\d{8}$";
 
     /**
      * loginId 중복 체크
@@ -30,13 +31,18 @@ public class UserService {
         return userRepository.existsByPhone(phone);
     }
 
+    public boolean checkphoneType(String phone) {
+        return Pattern.matches(PHONE_REGEX, phone);
+    }
+
     /**
      * 회원가입 기능 1
      * 화면에서 JoinRequest(phone...)을 입력받아 User로 변환 후 저장
      * phone 등 중복 체크는 Controller에서 진행 => 에러 메세지 출력을 위해
      */
-    public void join(JoinRequest req) {
+    public Long join(JoinRequest req) {
         userRepository.save(req.toEntity());
+        return userRepository.findIdByPhone(req.getPhone());
     }
 
     /**
