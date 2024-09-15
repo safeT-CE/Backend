@@ -1,6 +1,7 @@
-package com.example.safeT.kickboard;
+package com.example.safeT.kickboard.controller;
 
 import com.example.safeT.kickboard.entity.Kickboard;
+import com.example.safeT.kickboard.service.RentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

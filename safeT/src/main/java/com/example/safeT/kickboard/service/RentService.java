@@ -1,4 +1,4 @@
-package com.example.safeT.kickboard;
+package com.example.safeT.kickboard.service;
 
 import com.example.safeT.kickboard.entity.Kickboard;
 import com.example.safeT.kickboard.entity.Penalty;
