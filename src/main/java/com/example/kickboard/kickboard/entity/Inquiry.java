@@ -1,5 +1,6 @@
 package com.example.kickboard.kickboard.entity;
 
+import com.example.kickboard.login.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,9 +20,6 @@ public class Inquiry {
     private Long id;
 
     @Column(nullable = false)
-    private Long userId;
-
-    @Column(nullable = false)
     private String subject;
 
     @Column(nullable = false, length = 2000)
@@ -31,78 +29,14 @@ public class Inquiry {
     private LocalDateTime createdAt;
 
     @Column(nullable = true)
-    private LocalDateTime updatedAt;
-
-    @Column(nullable = true)
     private LocalDateTime respondedAt;
 
     @Column(nullable = true)
     private String response;
 
-    // Getters and Setters
+    @ManyToOne
+    @JoinColumn(name = "userId")
+    private User user;
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
-    public String getSubject() {
-        return subject;
-    }
-
-    public void setSubject(String subject) {
-        this.subject = subject;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getRespondedAt() {
-        return respondedAt;
-    }
-
-    public void setRespondedAt(LocalDateTime respondedAt) {
-        this.respondedAt = respondedAt;
-    }
-
-    public String getResponse() {
-        return response;
-    }
-
-    public void setResponse(String response) {
-        this.response = response;
-    }
 }
 

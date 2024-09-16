@@ -17,16 +17,16 @@ public class InquiryController {
     private InquiryService inquiryService;
 
     // 사용자 ID로 개인 문의 사항 조회
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Inquiry>> getInquiriesByUserId(@PathVariable Long userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<List<Inquiry>> getInquiriesByUserId(@PathVariable("userId") Long userId) {
         List<Inquiry> inquiries = inquiryService.getInquiriesByUserId(userId);
         return ResponseEntity.ok(inquiries);
     }
 
     // 개인 문의 글쓰기
-    @PostMapping
-    public ResponseEntity<Inquiry> createInquiry(@RequestBody Inquiry inquiry) {
-        Inquiry createdInquiry = inquiryService.createInquiry(inquiry);
+    @PostMapping("")
+    public ResponseEntity<Inquiry> createInquiry( @RequestParam("userId") Long userId, @RequestBody Inquiry inquiry) {
+        Inquiry createdInquiry = inquiryService.createInquiry(userId, inquiry);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdInquiry);
     }
 

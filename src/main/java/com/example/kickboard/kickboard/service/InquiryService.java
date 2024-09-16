@@ -2,6 +2,8 @@ package com.example.kickboard.kickboard.service;
 
 import com.example.kickboard.kickboard.entity.Inquiry;
 import com.example.kickboard.kickboard.repository.InquiryRepository;
+import com.example.kickboard.login.entity.User;
+import com.example.kickboard.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,15 +17,28 @@ public class InquiryService {
     @Autowired
     private InquiryRepository inquiryRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
     // 사용자 ID로 문의 목록 조회
     public List<Inquiry> getInquiriesByUserId(Long userId) {
         return inquiryRepository.findByUserId(userId);
     }
 
     // 문의 작성
-    public Inquiry createInquiry(Inquiry inquiry) {
-        inquiry.setCreatedAt(LocalDateTime.now());
-        return inquiryRepository.save(inquiry);
+    public Inquiry createInquiry(Long userId, Inquiry inquiry) {
+        Optional<User> userOptional = userRepository.findById(userId);
+
+        // 유효한 User
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            inquiry.setUser(user);
+            inquiry.setCreatedAt(LocalDateTime.now());
+            return inquiryRepository.save(inquiry);
+        } else {
+            // User가 존재하지 않을 때
+            throw new IllegalArgumentException("Invalid userId: " + userId);
+        }
     }
 
     // ID로 문의 조회
@@ -37,7 +52,7 @@ public class InquiryService {
             return null; // 문의가 존재하지 않을 시 null 반환
         }
         updatedInquiry.setId(id);
-        updatedInquiry.setUpdatedAt(LocalDateTime.now());
+        //updatedInquiry.setUpdatedAt(LocalDateTime.now());
         return inquiryRepository.save(updatedInquiry);
     }
 

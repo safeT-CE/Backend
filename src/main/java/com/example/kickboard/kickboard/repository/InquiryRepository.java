@@ -7,5 +7,6 @@ import java.util.List;
 
 
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
+    
     List<Inquiry> findByUserId(Long userId);
 }
