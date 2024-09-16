@@ -20,6 +20,7 @@ public class JoinRequest {
         User user = User.builder()
                 .phone(this.phone)
                 .grade(Grade.Bronze)
+                .identity("")
                 .build();
         return user;
             }

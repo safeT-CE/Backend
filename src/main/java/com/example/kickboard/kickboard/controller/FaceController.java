@@ -73,7 +73,6 @@ public class FaceController {
             while ((line = errorReader.readLine()) != null) {
                 System.err.println("Python error: " + line);
             }
-            //
 
             int exitCode =  process.waitFor();
             log.info("faceController1 : {}", userId);
@@ -84,19 +83,10 @@ public class FaceController {
             Files.delete(licenseFile.toPath());
             Files.delete(faceFile.toPath());
 
-            faceService.checkSamePerson(samePerson);
-            if(exitCode == 0){
-                response.put("samePerson", samePerson);
-                return new ResponseEntity<>(response, HttpStatus.OK);
-            } else{
-                //response.put("message", "Can't store the CSV file");
-                response.put("samePerson", samePerson);
-                return new ResponseEntity<>(response, HttpStatus.NOT_MODIFIED);
-            }
+            response.put("samePerson", samePerson);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         } catch (IOException | InterruptedException e){
             e.printStackTrace();
-            response.put("samePerson", "server error");
-            //response.put("message", "Exception occurred : " + e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
