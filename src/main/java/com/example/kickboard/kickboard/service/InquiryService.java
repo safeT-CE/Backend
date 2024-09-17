@@ -63,7 +63,8 @@ public class InquiryService {
             Inquiry inquiry = inquiryOpt.get();
             inquiry.setResponse(response);
             inquiry.setRespondedAt(LocalDateTime.now());
-            return inquiryRepository.save(inquiry);
+            inquiryRepository.saveResponse(id, response);
+            return inquiry;
         }
         return null; // 문의가 존재하지 않을 시 null 반환
     }
