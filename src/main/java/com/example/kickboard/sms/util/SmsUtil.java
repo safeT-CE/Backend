@@ -14,17 +14,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class SmsUtil {
 
-    //@Value("${coolsms.api.sendNumber}")
-    //@Value("01071575997")
     @Value("${COOL_SMS_NUMBER}")
     private String sendNumber;
 
-    //@Value("${coolsms.api.key}")
     @Value("${COOL_SMS_KEY}")
     private String apiKey;
 
-    //@Value("${coolsms.api.secret}")
-    //@Value("4YKBPYQCSGYGKXOEQFMAGC3UBSILQ8GB")
     @Value("${COOL_SMS_SECRET}")
     private String apiSecret;
 
