@@ -20,10 +20,13 @@ public class Inquiry {
     private Long id;
 
     @Column(nullable = false)
-    private String subject;
+    private String title;
 
     @Column(nullable = false, length = 2000)
-    private String message;
+    private String content;
+
+    @Column(nullable = false)
+    private Category category;
 
     @Column(nullable = false)
     private LocalDateTime createdAt;
