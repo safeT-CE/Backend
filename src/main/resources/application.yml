@@ -20,15 +20,15 @@ spring:
         encoding: UTF-8
         cache-duration: PT1H
     redis:
-        host: localhost
-        port: 6379
+        host: ${COOL_SMS_HOST}
+        port: ${COOL_SMS_PORT}
         repositories:
             enabled: false
     coolsms:
         api:
-            key: ${coolsms.api.key}
-            secret: ${coolsms.api.secret}
-            sendNumber: ${coolsms.sendnumber}
+            key: ${COOL_SMS_KEY}
+            secret: ${COOL_SMS_SECRET}
+            sendNumber: ${COOL_SMS_NUMBER}
 server:
     port: 8080
     address: 0.0.0.0

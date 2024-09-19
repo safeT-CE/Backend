@@ -14,9 +14,9 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
 @Configuration
 public class RedisConfig {
 
-    @Value("${coolsms.api.host}")
+    @Value("${COOL_SMS_HOST}")
     private String redisHost;
-    @Value("${coolsms.api.port}")
+    @Value("${COOL_SMS_PORT}")
     private int redisPort;
 
     @Bean
