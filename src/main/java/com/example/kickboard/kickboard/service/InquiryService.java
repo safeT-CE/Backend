@@ -5,6 +5,7 @@ import com.example.kickboard.kickboard.repository.InquiryRepository;
 import com.example.kickboard.login.entity.User;
 import com.example.kickboard.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,7 +23,8 @@ public class InquiryService {
 
     // 사용자 ID로 문의 목록 조회
     public List<Inquiry> getInquiriesByUserId(Long userId) {
-        return inquiryRepository.findByUserId(userId);
+        return inquiryRepository.findByUserId(userId, Sort.by(Sort.Direction.DESC, "createdAt"));
+        //return inquiryRepository.findByUserId(userId);
     }
 
     // 문의 작성

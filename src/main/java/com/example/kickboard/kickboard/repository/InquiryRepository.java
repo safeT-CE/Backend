@@ -2,6 +2,7 @@ package com.example.kickboard.kickboard.repository;
 
 import com.example.kickboard.kickboard.entity.Inquiry;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -11,8 +12,8 @@ import java.util.List;
 
 
 public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
-    
-    List<Inquiry> findByUserId(Long userId);
+
+    List<Inquiry> findByUserId(Long userId, Sort sort);
 
     @Transactional
     @Modifying
