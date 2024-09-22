@@ -33,7 +33,7 @@ public class PenaltyService {
 
     private final PenaltyRepository penaltyRepository;
     private final UserRepository userRepository;
-    private final NotificationService notificationService;  //
+    private final NotificationService notificationService;
 
     private final S3Service s3Service;
 
@@ -51,7 +51,7 @@ public class PenaltyService {
         this.penaltyRepository = penaltyRepository;
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
-        this.notificationService = notificationService; //
+        this.notificationService = notificationService;
         this.s3Service = s3Service;
     }
 

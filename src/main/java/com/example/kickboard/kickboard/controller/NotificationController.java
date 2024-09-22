@@ -19,7 +19,7 @@ public class NotificationController {
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
     @GetMapping("/subscribe/{userId}")
-    public SseEmitter subscribe(@PathVariable Long userId) {
+    public SseEmitter subscribe(@PathVariable("userId") Long userId) {
         SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
 
         emitters.put(userId, emitter);
@@ -31,7 +31,7 @@ public class NotificationController {
     }
 
     @PostMapping("/notify/{userId}")
-    public void notify(@PathVariable Long userId, @RequestBody String message) {
+    public void notify(@PathVariable("userId") Long userId, @RequestBody String message) {
         SseEmitter emitter = emitters.get(userId);
         if (emitter != null) {
             try {

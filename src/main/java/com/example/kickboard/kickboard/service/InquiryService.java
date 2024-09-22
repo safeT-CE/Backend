@@ -1,5 +1,6 @@
 package com.example.kickboard.kickboard.service;
 
+import com.example.kickboard.kickboard.dto.InquiryRequest;
 import com.example.kickboard.kickboard.entity.Inquiry;
 import com.example.kickboard.kickboard.repository.InquiryRepository;
 import com.example.kickboard.login.entity.User;
@@ -17,6 +18,9 @@ public class InquiryService {
 
     @Autowired
     private InquiryRepository inquiryRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Autowired
     private UserRepository userRepository;
@@ -59,13 +63,18 @@ public class InquiryService {
     }
 
     // 관리자 문의 답변 추가
-    public Inquiry respondToInquiry(Long id, String response) {
+    public Inquiry respondToInquiry(Long id, InquiryRequest request) {
         Optional<Inquiry> inquiryOpt = inquiryRepository.findById(id);
+        String response = request.getResponse();
         if (inquiryOpt.isPresent()) {
             Inquiry inquiry = inquiryOpt.get();
             inquiry.setResponse(response);
             inquiry.setRespondedAt(LocalDateTime.now());
             inquiryRepository.saveResponse(id, response);
+
+            // 답변 등록 후 알림
+            notificationService.notifyUser(request.getUserId(), response);
+
             return inquiry;
         }
         return null; // 문의가 존재하지 않을 시 null 반환

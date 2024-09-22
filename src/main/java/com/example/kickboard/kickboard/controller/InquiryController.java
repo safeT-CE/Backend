@@ -1,5 +1,6 @@
 package com.example.kickboard.kickboard.controller;
 
+import com.example.kickboard.kickboard.dto.InquiryRequest;
 import com.example.kickboard.kickboard.entity.Inquiry;
 import com.example.kickboard.kickboard.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +47,8 @@ public class InquiryController {
 
     // 관리자 문의 답변 추가
     @PostMapping("/{id}/response")
-    public ResponseEntity<Inquiry> respondToInquiry(@PathVariable("id") Long id, @RequestBody String response) {
-        Inquiry updatedInquiry = inquiryService.respondToInquiry(id, response);
+    public ResponseEntity<Inquiry> respondToInquiry(@PathVariable("id") Long id, @RequestBody InquiryRequest request) {
+        Inquiry updatedInquiry = inquiryService.respondToInquiry(id, request);
         return updatedInquiry != null ? ResponseEntity.ok(updatedInquiry) : ResponseEntity.notFound().build(); // 문의가 존재하지 않을 시 404 Not Found 응답 반환
     }
 }
