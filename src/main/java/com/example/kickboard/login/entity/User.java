@@ -1,6 +1,7 @@
 package com.example.kickboard.login.entity;
 
 import com.example.kickboard.login.validation.NoHyphen;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.DynamicInsert;
@@ -41,7 +42,8 @@ public class User {
     @Column(name = "ticket", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean ticket;
 
-    @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00:00'")
+    @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00'")
+    @JsonFormat(pattern = "HH:mm")
     private LocalTime useTime;
 
     // identity : csv 저장 위치가 기록됨.
@@ -51,5 +53,7 @@ public class User {
     @Column(name = "samePerson")
     private String samePerson;
 
-
+    public void setUseTime(LocalTime useTime) {
+        this.useTime = useTime.withSecond(0).withNano(0); // 시와 분만 남기고 초와 나노초는 제거
+    }
 }
