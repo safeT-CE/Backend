@@ -1,5 +1,6 @@
 package com.example.safeT.kickboard.entity;
 
+import com.example.safeT.login.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,24 +18,22 @@ public class Rental {
     @Column(name = "id", updatable = false)
     private Long id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+
     @Column(name = "kickboard_id", nullable = false)
     private Long kickboardId;
-
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
 
     @Column(name = "penalty_id", nullable = false)
     private Long penaltyId;
 
-    // 대여 시각
     @Column(name = "rented_at", nullable = false)
     private LocalDateTime rentedAt;
 
-    // 반납 여부
     @Column(name = "returned", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean returned;
 
-    // 반납 시각
     @Column(name = "returned_at")
     private LocalDateTime returnedAt;
 }

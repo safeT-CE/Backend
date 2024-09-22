@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/rent")
-public class RentController {
+@RequestMapping("/kickboard")
+public class KickboardController {
 
     @Autowired
     private RentService rentService;

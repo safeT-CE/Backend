@@ -51,4 +51,8 @@ public class User {
     @Column(name = "identity", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'x'")
     private String identity;
 
+    // Rental과의 관계 설정 (1:N)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    private List<Rental> rentals;
+
 }

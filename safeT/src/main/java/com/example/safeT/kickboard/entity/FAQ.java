@@ -1,5 +1,6 @@
 package com.example.safeT.kickboard.entity;
 
+import com.example.safeT.login.entity.User;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Getter;
