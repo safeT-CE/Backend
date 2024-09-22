@@ -3,6 +3,7 @@ package com.example.safeT.kickboard.service;
 import com.example.safeT.kickboard.entity.Kickboard;
 import com.example.safeT.kickboard.entity.Penalty;
 import com.example.safeT.kickboard.entity.Rental;
+import com.example.safeT.kickboard.entity.Location;
 import com.example.safeT.login.entity.User;
 import com.example.safeT.kickboard.repository.KickboardRepository;
 import com.example.safeT.kickboard.repository.PenaltyRepository;
@@ -46,7 +47,7 @@ public class RentService {
 
     // 킥보드 대여
     @Transactional
-    public String rentKickboard(Long kickboardId, Long userId, Long penaltyId) {
+    public String rentKickboard(Long kickboardId, Long userId, Long penaltyId, PMap startLocation) {
         // 킥보드 존재 여부 확인
         Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
         if (kickboardOptional.isEmpty()) {
@@ -83,6 +84,7 @@ public class RentService {
         rental.setPenaltyId(penaltyId);
         rental.setRentedAt(LocalDateTime.now());
         rental.setReturned(false);
+        rental.setStartLocation(startLocation); // 대여 시작 위치 저장
         rentalRepository.save(rental);
 
         return "Kickboard rented successfully";
@@ -90,7 +92,7 @@ public class RentService {
 
     // 킥보드 반납
     @Transactional
-    public String returnKickboard(Long kickboardId) {
+    public String returnKickboard(Long kickboardId, Location endLocation) {
         // 킥보드 존재 여부 확인
         Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
         if (kickboardOptional.isEmpty()) {
@@ -114,6 +116,7 @@ public class RentService {
             Rental rental = rentalOptional.get();
             rental.setReturned(true);
             rental.setReturnedAt(LocalDateTime.now());
+            rental.setEndLocation(endLocation); // 반납 위치 저장
             rentalRepository.save(rental);
         }
 

@@ -2,10 +2,12 @@ package com.example.safeT.kickboard.service;
 
 import com.example.safeT.kickboard.dto.RentalDetailDTO;
 import com.example.safeT.kickboard.entity.Rental;
+import com.example.safeT.kickboard.entity.Location;
 import com.example.safeT.kickboard.repository.RentalRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -40,6 +42,16 @@ public class RentalDetailService {
         dto.setRentedAt(rental.getRentedAt());
         dto.setReturned(rental.getReturned());
         dto.setReturnedAt(rental.getReturnedAt());
+        dto.setRentalLocation(rental.getRentalLocation());
+        dto.setReturnLocation(rental.getReturnLocation());
+
+        // 주행 거리 계산
+        if (rental.getStartLocation() != null && rental.getReturnedAt() != null) {
+            PMap startLocation = rental.getStartLocation(); // 대여 장소
+            PMap endLocation = rental.getEndLocation(); // 반납 장소
+            double distance = DistanceCalculator.calculateDistance(startLocation, endLocation);
+            dto.setDistance(distance); // DTO에 거리 추가
+        }
         return dto;
     }
 }
