@@ -1,7 +1,7 @@
 package com.example.safeT.kickboard.entity;
 
 import com.example.safeT.login.entity.User;
-import com.example.safeT.kickboard.entity.PMap;
+import com.example.safeT.kickboard.entity.Location;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
