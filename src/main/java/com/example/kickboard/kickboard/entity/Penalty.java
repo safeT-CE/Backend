@@ -39,6 +39,8 @@ public class Penalty {
     @Embedded
     private PMap map;
 
+
+    // 삭제 가능 : 한 번 대여했을 때 감지되는 횟수(같은 content)
     @Column(name = "detectionCount", updatable = false)
     private int detectionCount;
 

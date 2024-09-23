@@ -203,7 +203,8 @@ public class PenaltyService {
         List<String> deletePhoto = penaltyRepository.findIdPhotoDateBefore(cutoffTime);
 
         // 데이터베이스 레코드 삭제
-        penaltyRepository.deleteByDateBefore(cutoffTime);
+        //penaltyRepository.deleteByDateBefore(cutoffTime);
+        penaltyRepository.deletePhotoByDateBefore(cutoffTime);
 
         // S3 파일 삭제
         if(deletePhoto != null && !deletePhoto.isEmpty()){
