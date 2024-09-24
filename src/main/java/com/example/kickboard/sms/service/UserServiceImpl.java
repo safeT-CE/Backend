@@ -6,12 +6,14 @@ import com.example.kickboard.sms.dto.UserRequest;
 import com.example.kickboard.sms.exception.CustomExceptions;
 import com.example.kickboard.sms.util.SmsUtil;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final SmsUtil smsUtil;

@@ -15,7 +15,7 @@ public class PenaltyAllResponse {
 
     private String content;
 
-    private int totalCount;
+    private int penaltyCount;
 
     private String location;
 
@@ -23,12 +23,12 @@ public class PenaltyAllResponse {
 
     public PenaltyAllResponse(String content,
                                  LocalDateTime date,
-                                 int totalCount,
+                                 int penaltyCount,
                                  String location,
                                  int detectionCount) {
         this.content = content;
         this.date = date;
-        this.totalCount = totalCount;
+        this.penaltyCount = penaltyCount;
         this.location = location;
         this.detectionCount = detectionCount;
     }

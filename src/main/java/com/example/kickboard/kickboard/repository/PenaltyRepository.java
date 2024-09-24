@@ -15,6 +15,8 @@ public interface PenaltyRepository extends JpaRepository<Penalty, Long> {
 
      long countByUserId(Long userId);
 
+     @Query("SELECT COUNT(*) FROM Penalty")
+     long countAll();
      void deleteByDateBefore(LocalDateTime date);
      void deletePhotoByDateBefore(LocalDateTime cutoffTime);
 

@@ -15,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.example.kickboard.kickboard.entity.Category.penalty;
+
 @Service
 public class PenaltyWebService {
 
@@ -23,11 +25,12 @@ public class PenaltyWebService {
 
     public List<PenaltyAllResponse> getPenalties() {
         List<Penalty> penalties = penaltyRepository.findAll();
+
         return penalties.stream()
                 .map(penalty -> new PenaltyAllResponse(
                         penalty.getContent(),
                         penalty.getDate(),
-                        penalty.getTotalCount(),
+                        ((int) penaltyRepository.countAll()),
                         penalty.getLocation(),
                         penalty.getDetectionCount()
                 ))

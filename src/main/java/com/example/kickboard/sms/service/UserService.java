@@ -4,7 +4,6 @@ package com.example.kickboard.sms.service;
 
 
 import com.example.kickboard.sms.dto.UserRequest;
-import org.springframework.transaction.annotation.Transactional;
 
 public interface UserService {
 
