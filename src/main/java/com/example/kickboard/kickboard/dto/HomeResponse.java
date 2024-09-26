@@ -10,9 +10,9 @@ import java.time.LocalTime;
 public class HomeResponse {
     private String phone;
     private Grade grade;
-    private LocalTime useTime;
+    private String useTime;
 
-    public HomeResponse(String phone, Grade grade, LocalTime useTime) {
+    public HomeResponse(String phone, Grade grade, String useTime) {
         this.phone = phone;
         this.grade = grade;
         this.useTime = useTime;

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -24,18 +25,25 @@ public class InfoService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            // User 객체에서 필요한 데이터 추출
-            String phone = user.getPhone();
-            Grade grade = user.getGrade();
-            int point = user.getPoint();
-            LocalTime useTime = user.getUseTime();
-
-            // ProfileResponse 객체 생성
-            return new ProfileResponse(phone, grade, point, useTime);
+            return convertToDto(user);
         } else {
-            // 사용자를 찾지 못한 경우 예외 처리 (예: 사용자 없음 예외 발생)
+            // 사용자를 찾지 못한 경우
             throw new UserIdNotFoundException("User not found with id: " + id);
         }
+    }
+
+    public static ProfileResponse convertToDto(User user) {
+        // User 객체에서 필요한 데이터 추출
+        String phone = user.getPhone();
+        Grade grade = user.getGrade();
+        int point = user.getPoint();
+        LocalTime useTime = user.getUseTime();
+
+        // 날짜 포맷 지정
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H시간m분");
+
+        // ProfileResponse 객체 생성
+        return new ProfileResponse(phone, grade, point, useTime.format(formatter));
     }
 
     public HomeResponse getHomeInfo(Long id) {
@@ -44,15 +52,13 @@ public class InfoService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            // User 객체에서 필요한 데이터 추출
             String phone = user.getPhone();
             Grade grade = user.getGrade();
             LocalTime useTime = user.getUseTime();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("H시간m분");
 
-            // ProfileResponse 객체 생성
-            return new HomeResponse(phone, grade, useTime);
+            return new HomeResponse(phone, grade, useTime.format(formatter));
         } else {
-            // 사용자를 찾지 못한 경우 예외 처리 (예: 사용자 없음 예외 발생)
             throw new UserIdNotFoundException("User not found with id: " + id);
         }
     }

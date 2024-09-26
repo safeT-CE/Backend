@@ -1,6 +1,7 @@
 package com.example.kickboard.kickboard.entity;
 
 import com.example.kickboard.login.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

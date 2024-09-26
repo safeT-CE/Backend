@@ -45,7 +45,7 @@ public class User {
     private Boolean ticket;
 
     @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00'")
-    @JsonFormat(pattern = "HH:mm")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime useTime;
 
     // identity : csv 저장 위치가 기록됨.

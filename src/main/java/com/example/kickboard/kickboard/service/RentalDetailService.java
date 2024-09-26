@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -62,13 +63,15 @@ public class RentalDetailService {
     private RentalDetailResponse convertToDTO(Rental rental) {
         // 지번 주소 DTO로 변환
         RentalDetailResponse dto = convertDTO(rental);
+        // 직접 포맷 변환
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        String formattedDate = rental.getRentedAt().format(formatter);
 
         // Rental 엔티티를 DTO로 변환
         dto.setDuration(rental.getDuration());
-        dto.setRentedAt(rental.getRentedAt());
+        dto.setRentedAt(formattedDate);
         dto.setRentalLocation(rental.getRentalLocation());
         dto.setReturnLocation(rental.getReturnLocation());
-
 
         return dto;
     }

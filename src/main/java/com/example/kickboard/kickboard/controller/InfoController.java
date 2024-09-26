@@ -5,7 +5,6 @@ import com.example.kickboard.kickboard.dto.HomeResponse;
 import com.example.kickboard.kickboard.dto.ProfileResponse;
 import com.example.kickboard.kickboard.service.InfoService;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,8 +16,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@Slf4j
-@RequestMapping(value="/")
+@RequestMapping(value="/", produces = "application/json; charset=UTF-8")
 public class InfoController {
 
     private final InfoService profileService;
@@ -33,7 +31,6 @@ public class InfoController {
         response.put("point", profile.getPoint());
         response.put("useTime", profile.getUseTime());
 
-        log.debug("profileService : {}", id);
         return ResponseEntity.ok(response);
     }
 
@@ -46,7 +43,6 @@ public class InfoController {
         response.put("grade", home.getGrade());
         response.put("useTime", home.getUseTime().toString());
 
-        log.debug("profileService : {}", id);
         return ResponseEntity.ok(response);
     }
 }

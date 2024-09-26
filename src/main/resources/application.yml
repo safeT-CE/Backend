@@ -1,4 +1,9 @@
 spring:
+    http:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
     datasource:
         url : ${SPRING_DATASOURCE_URL}
         username: root
