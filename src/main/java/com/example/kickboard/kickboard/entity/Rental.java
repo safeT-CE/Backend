@@ -54,4 +54,11 @@ public class Rental {
             @AttributeOverride(name = "longitude", column = @Column(name = "return_longitude"))
     })
     private Location returnLocation; // 반납 장소
+
+    // 지번 주소
+    @Column(name = "rental_address")
+    private String rentalAddress;
+
+    @Column(name = "return_address")
+    private String returnAddress;
 }

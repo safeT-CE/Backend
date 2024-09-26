@@ -2,6 +2,8 @@ package com.example.kickboard.kickboard.controller;
 
 // SSE 방식 알림
 
+import com.example.kickboard.kickboard.service.NotificationService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -12,23 +14,33 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 @RequestMapping("/notifications")
 public class NotificationController {
 
     private final Map<Long, SseEmitter> emitters = new ConcurrentHashMap<>();
 
-    @GetMapping("/subscribe/{userId}")
-    public SseEmitter subscribe(@PathVariable("userId") Long userId) {
-        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+    //
+    private final NotificationService notificationService;
 
-        emitters.put(userId, emitter);
-
-        emitter.onCompletion(() -> emitters.remove(userId));
-        emitter.onTimeout(() -> emitters.remove(userId));
-
-        return emitter;
+    @GetMapping(value = "/subscribe/{user_id}", produces = "text/event-stream;charset=UTF-8")
+    public SseEmitter subscribe(@PathVariable(value = "user_id") Long userId) {
+        return notificationService.subscribe(userId);
     }
+    //
+
+//    @GetMapping("/subscribe/{userId}")
+//    public SseEmitter subscribe(@PathVariable("userId") Long userId) {
+//        SseEmitter emitter = new SseEmitter(Long.MAX_VALUE);
+//
+//        emitters.put(userId, emitter);
+//
+//        emitter.onCompletion(() -> emitters.remove(userId));
+//        emitter.onTimeout(() -> emitters.remove(userId));
+//
+//        return emitter;
+//    }
 
     @PostMapping("/notify/{userId}")
     public void notify(@PathVariable("userId") Long userId, @RequestBody String message) {

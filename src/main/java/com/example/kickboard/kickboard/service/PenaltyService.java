@@ -142,8 +142,9 @@ public class PenaltyService {
             Penalty savedPenalty = penaltyRepository.save(penalty);
 
             // 벌점 등록 후 사용자에게 알림 전송
-            String message = request.getContent();
-            notificationService.notifyUser(userId, message);
+            String content = request.getContent();
+            String date = request.getDate().toString();
+            notificationService.penaltyNotify(userId, content, date);
 
             return savedPenalty;
         }catch (CustomException e){
@@ -155,12 +156,12 @@ public class PenaltyService {
     }
 
     private String getLocation(ResponseEntity<KakaoApiResponse> response){
-        if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getDocuments().isEmpty()){
-            KakaoApiResponse.Document document = response.getBody().getDocuments().get(0);
-            return document.getAddress().getAddressName();
-        } else if(response.getStatusCode().is4xxClientError()) {
-            throw  new CustomException(HttpStatus.BAD_REQUEST, "Client error : " + response.getStatusCode());
-        } else if (response.getStatusCode().is5xxServerError()) {
+            if(response.getStatusCode().is2xxSuccessful() && !response.getBody().getDocuments().isEmpty()){
+                KakaoApiResponse.Document document = response.getBody().getDocuments().get(0);
+                return document.getAddress().getAddressName();
+            } else if(response.getStatusCode().is4xxClientError()) {
+                throw  new CustomException(HttpStatus.BAD_REQUEST, "Client error : " + response.getStatusCode());
+            } else if (response.getStatusCode().is5xxServerError()) {
             throw new CustomException(HttpStatus.INTERNAL_SERVER_ERROR, "Server error : " + response.getStatusCode());
         } else {
              throw new CustomException(HttpStatus.CREATED, "Address not found");

@@ -73,7 +73,7 @@ public class InquiryService {
             inquiryRepository.saveResponse(id, response);
 
             // 답변 등록 후 알림
-            notificationService.notifyUser(request.getUserId(), response);
+            notificationService.inquiryNotify(request.getUserId(), inquiry.getTitle(), response);
 
             return inquiry;
         }
