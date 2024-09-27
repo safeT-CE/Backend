@@ -1,6 +1,5 @@
 package com.example.kickboard.kickboard.controller;
 
-
 import com.example.kickboard.kickboard.dto.HomeResponse;
 import com.example.kickboard.kickboard.dto.ProfileResponse;
 import com.example.kickboard.kickboard.service.InfoService;

@@ -3,15 +3,10 @@ package com.example.kickboard.kickboard.service;
 import com.example.kickboard.kickboard.dto.FaceRequest;
 import com.example.kickboard.kickboard.exception.UserIdNotFoundException;
 import com.example.kickboard.login.repository.UserRepository;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.services.s3.endpoints.internal.Value;
-
 @Service
-@Slf4j
 public class FaceService {
 
     private final UserRepository userRepository;
@@ -31,11 +26,8 @@ public class FaceService {
     @Transactional
     public void saveIdentity(String user_id, FaceRequest request) {
         Long userId = Long.parseLong(user_id);
-        log.info("face service1");
         String currentIdentity = userRepository.findIdentityById(userId);
-        log.info("face service2 : {}", currentIdentity);
         if (userId != null) {
-            log.info("face service3");
             if (currentIdentity != null && !currentIdentity.isBlank()) { // 재등록할 경우
                 s3Service.deleteImage(currentIdentity);
             }

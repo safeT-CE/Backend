@@ -62,12 +62,13 @@ public class RentalDetailService {
     // Rental 엔티티를 DTO로 변환
     private RentalDetailResponse convertToDTO(Rental rental) {
         // 지번 주소 DTO로 변환
-        RentalDetailResponse dto = convertDTO(rental);
+        RentalDetailResponse dto = convertAddressDTO(rental);
         // 직접 포맷 변환
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = rental.getRentedAt().format(formatter);
 
         // Rental 엔티티를 DTO로 변환
+        dto.setId(rental.getId());
         dto.setDuration(rental.getDuration());
         dto.setRentedAt(formattedDate);
         dto.setRentalLocation(rental.getRentalLocation());
@@ -76,7 +77,7 @@ public class RentalDetailService {
         return dto;
     }
 
-    private RentalDetailResponse convertDTO(Rental rental){
+    private RentalDetailResponse convertAddressDTO(Rental rental){
         // 위도, 경도 -> 지번 주소 알아내기
         Location rentalMap = rental.getRentalLocation();
         Location returnMap = rental.getReturnLocation();

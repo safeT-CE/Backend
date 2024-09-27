@@ -19,4 +19,7 @@ public interface InquiryRepository extends JpaRepository<Inquiry, Long> {
     @Modifying
     @Query("UPDATE Inquiry i SET i.response = :response WHERE i.id = :id")
     void saveResponse(@Param("id") Long id,@Param("response") String response);
+
+    @Query("SELECT i.response FROM Inquiry i WHERE i.id = :id")
+    String findResponseById(@Param("id") Long id);
 }

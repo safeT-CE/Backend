@@ -1,8 +1,6 @@
 package com.example.kickboard.kickboard.service;
 
-import com.example.kickboard.kickboard.exception.CustomException;
 import com.example.kickboard.kickboard.repository.EmitterRepository;
-import com.example.kickboard.login.entity.User;
 import com.example.kickboard.login.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -23,48 +21,33 @@ public class NotificationService {
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = createEmitter(userId);
 
-        sendToClient(userId, "EventStream Created. [userId="+ userId + "]", "sse 접속 성공");
+        sendToClient(userId, "success","EventStream Created. [userId="+ userId + "]", "sse 접속 성공");
         return emitter;
     }
 
     public void penaltyNotify(Long userId, String content, String date) {
-        sendToClient(userId, content, date);
-    }
-    public void inquiryNotify(Long userId, String title, String response) {
-        sendToClient(userId, title, response);
+        sendToClient(userId, "penalty", content, date);
     }
 
-    private void sendToClient(Long userId,String content, String response) {
+    public void inquiryNotify(Long userId, String title, String response) {
+        sendToClient(userId, "inquiry", title, response);
+    }
+
+    private void sendToClient(Long userId, String type, String content, String response) {
         SseEmitter emitter = emitterRepository.get(userId);
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .id(String.valueOf(userId))
                         .name("sse")
-                        .data(content)
-                        .comment(response));
+                        .data(type)
+                        .comment(content));
             } catch (IOException e) {
                 emitterRepository.deleteById(userId);
                 emitter.completeWithError(e);
             }
         }
     }
-
-//    private <T> void sendToClient(Long userId, T data, String comment, String type) {
-//        SseEmitter emitter = emitterRepository.get(userId);
-//        if (emitter != null) {
-//            try {
-//                emitter.send(SseEmitter.event()
-//                        .id(String.valueOf(userId))
-//                        .name(type)
-//                        .data(data)
-//                        .comment(comment));
-//            } catch (IOException e) {
-//                emitterRepository.deleteById(userId);
-//                emitter.completeWithError(e);
-//            }
-//        }
-//    }
 
     private SseEmitter createEmitter(Long userId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);

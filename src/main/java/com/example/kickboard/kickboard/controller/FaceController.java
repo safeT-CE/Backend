@@ -96,7 +96,6 @@ public class FaceController {
     public ResponseEntity<Map<String, Object>>  uploadTestFile(@PathVariable("userId") String userId, @RequestBody FaceRequest request){
         try{
             faceService.saveIdentity(userId, request);
-            log.info("faceController uploadTestFile2 : {}", userId);
             Map<String, Object> response = new HashMap<>();
             response.put("userId", request.getUserId());
             response.put("identity", request.getIdentity());

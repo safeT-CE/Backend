@@ -79,9 +79,7 @@ public class PenaltyService {
 
     @Transactional
     public List<PenaltyDetailResponse> getPenaltyDetail(Long userId, Long penaltyId) {
-        log.info("PenaltyService : " + userId + ", " + penaltyId);
         List<Penalty> penalties = penaltyRepository.findByIdAndUserId(penaltyId, userId);
-        log.info("PenaltyService : " + userId + ", " + penaltyId);
         return penalties.stream()
                 .map(penalty -> new PenaltyDetailResponse(
                         penalty.getId(),
@@ -195,8 +193,6 @@ public class PenaltyService {
     @Scheduled(cron = "0 0 0 * * ?")    // 매일 자정
     @Transactional
     public void deleteRecords(){
-        log.info("Starting scheduled task: deleteRecords");
-
         //LocalDateTime cutoffTime = LocalDateTime.now().minusMinutes(5); // 테스트용
         LocalDateTime cutoffTime = LocalDateTime.now().minusDays(7); // 7일
 

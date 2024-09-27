@@ -55,11 +55,6 @@ public class User {
     @Column(name = "samePerson")
     private String samePerson;
 
-
-    // Rental과의 관계 설정 (1:N)
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Rental> rentals;
-
     public void setUseTime(LocalTime useTime) {
         this.useTime = useTime.withSecond(0).withNano(0); // 시와 분만 남기고 초와 나노초는 제거
     }

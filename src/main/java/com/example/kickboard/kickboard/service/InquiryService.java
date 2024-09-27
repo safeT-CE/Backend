@@ -63,20 +63,29 @@ public class InquiryService {
     }
 
     // 관리자 문의 답변 추가
-    public Inquiry respondToInquiry(Long id, InquiryRequest request) {
-        Optional<Inquiry> inquiryOpt = inquiryRepository.findById(id);
+    public boolean respondToInquiry(Long id, InquiryRequest request) {
         String response = request.getResponse();
-        if (inquiryOpt.isPresent()) {
+        inquiryRepository.saveResponse(id, response);
+        if (inquiryRepository.findResponseById(id).equals(request.getResponse())) {
+            //답변 등록 후 알림
+            Optional<Inquiry> inquiryOpt = inquiryRepository.findById(id);
             Inquiry inquiry = inquiryOpt.get();
-            inquiry.setResponse(response);
-            inquiry.setRespondedAt(LocalDateTime.now());
-            inquiryRepository.saveResponse(id, response);
-
-            // 답변 등록 후 알림
             notificationService.inquiryNotify(request.getUserId(), inquiry.getTitle(), response);
-
-            return inquiry;
+            return true;
         }
-        return null; // 문의가 존재하지 않을 시 null 반환
+        return false;
+//        Optional<Inquiry> inquiryOpt = inquiryRepository.findById(id);
+//        String response = request.getResponse();
+//        if (inquiryOpt.isPresent()) {
+//            Inquiry inquiry = inquiryOpt.get();
+//            inquiry.setResponse(response);
+//            inquiry.setRespondedAt(LocalDateTime.now());
+//            inquiryRepository.saveResponse(id, response);
+//
+
+//
+//            return inquiry;
+//        }
+//        return null; // 문의가 존재하지 않을 시 null 반환
     }
 }

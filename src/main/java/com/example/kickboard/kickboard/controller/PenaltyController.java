@@ -39,7 +39,6 @@ public class PenaltyController {
     @GetMapping(value = "/check/detail", produces = "application/json; charset=UTF-8")
     public ResponseEntity<Map<String, Object>> getPenaltyDetail(@RequestParam("userId") Long userId, @RequestParam("penaltyId")Long penaltyId) {
         List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId, penaltyId);
-        //List<PenaltyDetailResponse> penalties = penaltyService.getPenaltyDetail(userId);
         return createResponse(penalties, "penalty");
     }
 

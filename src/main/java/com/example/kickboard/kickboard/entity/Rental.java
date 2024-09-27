@@ -41,7 +41,7 @@ public class Rental {
     private LocalDateTime returnedAt;
 
     @Column(name = "duration")
-    private Long duration; // 주행 시간 (초 단위)
+    private Long duration; // 주행 시간 (분 단위)
 
     @AttributeOverrides({
             @AttributeOverride(name = "latitude", column = @Column(name = "rental_latitude")),

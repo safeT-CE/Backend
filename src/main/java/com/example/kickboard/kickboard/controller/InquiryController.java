@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/inquiries")
@@ -47,8 +49,15 @@ public class InquiryController {
 
     // 관리자 문의 답변 추가
     @PostMapping("/{id}/response")
-    public ResponseEntity<Inquiry> respondToInquiry(@PathVariable("id") Long id, @RequestBody InquiryRequest request) {
-        Inquiry updatedInquiry = inquiryService.respondToInquiry(id, request);
-        return updatedInquiry != null ? ResponseEntity.ok(updatedInquiry) : ResponseEntity.notFound().build(); // 문의가 존재하지 않을 시 404 Not Found 응답 반환
+    public ResponseEntity<Map<String, Object>> respondToInquiry(@PathVariable("id") Long id, @RequestBody InquiryRequest request) {
+        boolean answer = inquiryService.respondToInquiry(id, request);
+        if (answer) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("userId", request.getUserId());
+            response.put("inquiryId", id);
+            response.put("response", request.getResponse());
+            return ResponseEntity.ok(response);
+        } else
+            return ResponseEntity.status(500).body(Map.of("error", "Failed to register response"));
     }
 }
