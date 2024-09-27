@@ -30,10 +30,12 @@ public class NotificationService {
     }
 
     public void inquiryNotify(Long userId, String title, String response) {
+        log.info("NotificationService : inquiry");
         sendToClient(userId, "inquiry", title, response);
     }
 
     private void sendToClient(Long userId, String type, String content, String response) {
+        log.info("NotificationService : inquiry2");
         SseEmitter emitter = emitterRepository.get(userId);
         if (emitter != null) {
             try {
@@ -59,16 +61,3 @@ public class NotificationService {
         return emitter;
     }
 }
-
-
-//    private final NotificationController notificationController;
-//
-//    public NotificationService(NotificationController notificationController) {
-//        this.notificationController = notificationController;
-//    }
-//
-//    public void notifyUser(Long userId, String content,String response) {
-//        log.info("You have received a penalty: " + response);    // 확인용
-//        notificationController.notify(userId, "You have received a penalty: " + response);
-//    }
-//}
