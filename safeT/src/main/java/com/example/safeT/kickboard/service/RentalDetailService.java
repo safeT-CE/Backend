@@ -5,7 +5,7 @@ import com.example.safeT.kickboard.dto.RentalDetailResponse;
 import com.example.safeT.kickboard.entity.Location;
 import com.example.safeT.kickboard.entity.Rental;
 import com.example.safeT.kickboard.exception.CustomException;
-import com.example.safeT.kickboard.repository.RentalRepository;
+import com.example.safeT.kickboard.repository.RentalDetailRepository;
 import com.example.safeT.login.entity.User;
 import com.example.safeT.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,18 +23,18 @@ import java.util.stream.Collectors;
 @Service
 public class RentalDetailService {
 
-    private RentalRepository rentalRepository;
+    private RentalDetailRepository rentaldetailRepository;
     private UserRepository userRepository;
     @Value("${KAKAO_API_KEY}")
     private String apiKey;
     private final RestTemplate restTemplate;
 
     @Autowired
-    public RentalDetailService(RentalRepository rentalRepository,
+    public RentalDetailService(RentalDetailRepository rentaldetailRepository,
                                UserRepository userRepository,
                                RestTemplate restTemplate
     ) {
-        this.rentalRepository = rentalRepository;
+        this.rentaldetailRepository = rentaldetailRepository;
         this.userRepository = userRepository;
         this.restTemplate = restTemplate;
     }
@@ -44,7 +44,7 @@ public class RentalDetailService {
         Optional<User> userOpt = userRepository.findById(userId);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
-            List<Rental> rentals = rentalRepository.findByUser(user);
+            List<Rental> rentals = rentaldetailRepository.findByUser(user);
 
             return rentals.stream()
                     .map(this::convertToDTO)
@@ -55,7 +55,7 @@ public class RentalDetailService {
 
     // 세부 이용 내역 조회
     public RentalDetailResponse getRentalDetail(Long id) {
-        Optional<Rental> rental = rentalRepository.findById(id);
+        Optional<Rental> rental = rentaldetailRepository.findById(id);
         return rental.map(this::convertToDTO).orElse(null);
     }
 

@@ -84,7 +84,6 @@ public class RentService {
         rental.setPenaltyId(penaltyId);
         rental.setRentedAt(LocalDateTime.now());
         rental.setReturned(false);
-        rental.setStartLocation(startLocation); // 대여 시작 위치 저장
         rentalRepository.save(rental);
 
         return "Kickboard rented successfully";
@@ -116,7 +115,6 @@ public class RentService {
             Rental rental = rentalOptional.get();
             rental.setReturned(true);
             rental.setReturnedAt(LocalDateTime.now());
-            rental.setEndLocation(endLocation); // 반납 위치 저장
             rentalRepository.save(rental);
         }
 
