@@ -1,10 +1,9 @@
 package com.example.safeT.kickboard.controller;
 
+import lombok.RequiredArgsConstructor;
 import com.example.safeT.kickboard.dto.TicketRequest;
 import com.example.safeT.kickboard.exception.TicketAlreadyUpdatedException;
 import com.example.safeT.kickboard.service.TicketService;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +11,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.Map;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
-@Slf4j
 @RequestMapping(value = "/ticket")
 public class TicketController {
 
@@ -35,7 +33,7 @@ public class TicketController {
         }
     }
 
-    @PostMapping("/update")
+    @PostMapping("")
     public ResponseEntity<Map<String, Object>> changeTicketStatus(@RequestBody TicketRequest request){
         try {
             ticketService.buyTicket(request.getUserId());

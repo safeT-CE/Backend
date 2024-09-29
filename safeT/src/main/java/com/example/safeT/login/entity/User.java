@@ -41,18 +41,18 @@ public class User {
     @Column(name = "ticket", nullable = false, columnDefinition = "BIT DEFAULT 0")
     private Boolean ticket;
 
-    @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00:00'")
+    @Column(name = "useTime", nullable = false, columnDefinition = "time default '00:00'")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm")
     private LocalTime useTime;
 
-    @Column(name = "face", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'b'")
-    private String face;
-
     // identity : csv 저장 위치가 기록됨.
-    @Column(name = "identity", nullable = false, columnDefinition = "VARCHAR(255) DEFAULT 'x'")
+    @Column(name = "identity", columnDefinition = "VARCHAR(255)")
     private String identity;
 
-    // Rental과의 관계 설정 (1:N)
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    private List<Rental> rentals;
+    @Column(name = "samePerson")
+    private String samePerson;
 
+    public void setUseTime(LocalTime useTime) {
+        this.useTime = useTime.withSecond(0).withNano(0); // 시와 분만 남기고 초와 나노초는 제거
+    }
 }

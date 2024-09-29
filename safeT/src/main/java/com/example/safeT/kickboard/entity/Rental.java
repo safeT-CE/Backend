@@ -41,16 +41,25 @@ public class Rental {
     private LocalDateTime returnedAt;
 
     @Column(name = "duration")
-    private Long duration; // 주행 시간 (초 단위)
+    private Long duration; // 주행 시간 (분 단위)
 
-    @Column(name = "distance", nullable = false)
-    private double distance; // 주행 거리
-
-    @Column(name = "rental_location")
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "rental_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "rental_longitude"))
+    })
     @Embedded
     private Location rentalLocation; // 대여 장소
 
-    @Column(name = "return_location")
-    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "latitude", column = @Column(name = "return_latitude")),
+            @AttributeOverride(name = "longitude", column = @Column(name = "return_longitude"))
+    })
     private Location returnLocation; // 반납 장소
+
+    // 지번 주소
+    @Column(name = "rental_address")
+    private String rentalAddress;
+
+    @Column(name = "return_address")
+    private String returnAddress;
 }

@@ -1,5 +1,6 @@
 package com.example.safeT.kickboard.controller;
 
+import com.example.kickboard.kickboard.dto.InquiryRequest;
 import com.example.safeT.kickboard.entity.Inquiry;
 import com.example.safeT.kickboard.service.InquiryService;
 import org.springframework.beans.factory.annotation.Autowired;

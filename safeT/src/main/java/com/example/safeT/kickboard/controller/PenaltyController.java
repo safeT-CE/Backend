@@ -62,7 +62,7 @@ public class PenaltyController {
         }
     }
 
-    // Penalty 추가 : 수정 예정
+    // Penalty 추가
     @PostMapping
     public ResponseEntity<?> createPenalty(@RequestParam("userId") Long userId, @RequestBody PenaltyRequest request) {
         try {
