@@ -8,8 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/kickboard")
-public class KickboardController {
+@RequestMapping("/kickboard/rent")
+public class RentController {
 
     @Autowired
     private RentService rentService;
@@ -41,7 +41,7 @@ public class KickboardController {
     }
 
     // 킥보드 대여 요청 처리
-    @PostMapping("/rent")
+    @PostMapping
     public ResponseEntity<String> rentKickboard(@RequestParam Long kickboardId,
                                                 @RequestParam Long userId,
                                                 @RequestParam Long penaltyId) {
@@ -82,21 +82,6 @@ public class KickboardController {
 
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while renting the kickboard.");
-        }
-    }
-
-    // 킥보드 반납
-    @PostMapping("/return")
-    public ResponseEntity<String> returnKickboard(@RequestParam Long kickboardId) {
-        try {
-            String result = rentService.returnKickboard(kickboardId);
-            if ("Kickboard returned successfully".equals(result)) {
-                return ResponseEntity.ok("Kickboard successfully returned.");
-            } else {
-                return ResponseEntity.badRequest().body(result);
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while returning the kickboard.");
         }
     }
 }

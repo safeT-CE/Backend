@@ -23,7 +23,7 @@ public class ReturnService {
 
     // 킥보드 반납
     @Transactional
-    public String returnKickboard(Long kickboardId, Location endLocation) {
+    public String returnKickboard(Long kickboardId) {
         // 킥보드 존재 여부 확인
         Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
         if (kickboardOptional.isEmpty()) {
