@@ -15,7 +15,7 @@ public interface KickboardRepository extends JpaRepository<Kickboard, Long> {
     @Query("SELECT k FROM Kickboard k WHERE k.id = :id")
     Optional<Kickboard> findById(@Param("id") Long id);
 
-    // ID로 킥보드 대여 상태 조회
+    // 킥보드 ID로 킥보드 대여 여부 조회
     @Query("SELECT k.rented FROM Kickboard k WHERE k.id = :id")
     Boolean findRentedById(@Param("id") Long id);
 }

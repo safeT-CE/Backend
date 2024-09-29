@@ -3,11 +3,10 @@ package com.example.safeT.kickboard.service;
 import com.example.safeT.kickboard.entity.Kickboard;
 import com.example.safeT.kickboard.entity.Penalty;
 import com.example.safeT.kickboard.entity.Rental;
-import com.example.safeT.kickboard.entity.Location;
 import com.example.safeT.login.entity.User;
 import com.example.safeT.kickboard.repository.KickboardRepository;
 import com.example.safeT.kickboard.repository.PenaltyRepository;
-import com.example.safeT.kickboard.repository.RentalRepository;
+import com.example.safeT.kickboard.repository.RentalRecordRepository;
 import com.example.safeT.login.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,7 +22,7 @@ public class RentService {
     private KickboardRepository kickboardRepository;
 
     @Autowired
-    private RentalRepository rentalRepository;
+    private RentalRecordRepository rentalRecordRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -31,23 +30,9 @@ public class RentService {
     @Autowired
     private PenaltyRepository penaltyRepository;
 
-    // QR 코드로 킥보드 상세 정보 조회
-    public Kickboard getKickboardByQrCode(String qrCode) {
-        return kickboardRepository.findByQrCode(qrCode);
-    }
-
-    // 대여 번호로 킥보드 상세 정보 조회
-    public Kickboard getKickboardByRentalId(Long rentalId) {
-        Rental rental = rentalRepository.findById(rentalId).orElse(null);
-        if (rental != null) {
-            return kickboardRepository.findById(rental.getKickboardId()).orElse(null);
-        }
-        return null;
-    }
-
     // 킥보드 대여
     @Transactional
-    public String rentKickboard(Long kickboardId, Long userId, Long penaltyId, PMap startLocation) {
+    public String rentKickboard(Long kickboardId, Long userId, Long penaltyId) {
         // 킥보드 존재 여부 확인
         Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
         if (kickboardOptional.isEmpty()) {
@@ -56,7 +41,7 @@ public class RentService {
 
         Kickboard kickboard = kickboardOptional.get();
 
-        // 킥보드 대여 여부 확인
+        // 킥보드 대여 여부 조회
         if (kickboardRepository.findRentedById(kickboardId)) {
             return "Kickboard is not available";
         }
@@ -84,40 +69,8 @@ public class RentService {
         rental.setPenaltyId(penaltyId);
         rental.setRentedAt(LocalDateTime.now());
         rental.setReturned(false);
-        rentalRepository.save(rental);
+        rentalRecordRepository.save(rental);
 
         return "Kickboard rented successfully";
-    }
-
-    // 킥보드 반납
-    @Transactional
-    public String returnKickboard(Long kickboardId, Location endLocation) {
-        // 킥보드 존재 여부 확인
-        Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
-        if (kickboardOptional.isEmpty()) {
-            return "Kickboard not found";
-        }
-
-        Kickboard kickboard = kickboardOptional.get();
-
-        // 킥보드가 대여 중인지 확인
-        if (!kickboard.getRented()) {
-            return "Kickboard was not rented";
-        }
-
-        // 킥보드 대여 상태 변경
-        kickboard.setRented(false);
-        kickboardRepository.save(kickboard);
-
-        // 대여 기록을 찾아서 반납 상태로 변경
-        Optional<Rental> rentalOptional = rentalRepository.findTopByKickboardIdAndReturnedFalseOrderByRentedAtDesc(kickboardId);
-        if (rentalOptional.isPresent()) {
-            Rental rental = rentalOptional.get();
-            rental.setReturned(true);
-            rental.setReturnedAt(LocalDateTime.now());
-            rentalRepository.save(rental);
-        }
-
-        return "Kickboard returned successfully";
     }
 }
