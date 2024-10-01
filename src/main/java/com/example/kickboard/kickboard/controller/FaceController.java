@@ -29,9 +29,10 @@ public class FaceController {
     // 앱에 자신의 면허증 - 얼굴 등록
     @PostMapping("/request")
     public <T> ResponseEntity<Map<String, Object>> uploadFile(
-                                            @RequestParam("userId") Long userId,
+                                            @RequestParam("userId") String userId,
                                             @RequestParam("licenseImage") MultipartFile licenseImage,
                                             @RequestParam("faceImage") MultipartFile faceImage){
+        Long user_id = Long.parseLong(userId);
         Map<String, Object> response = new HashMap<>();
 
         Path temDir;
@@ -54,7 +55,7 @@ public class FaceController {
             ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/picNface.py",
                                                             licenseFile.getAbsolutePath(),
                                                             faceFile.getAbsolutePath(),
-                                                            String.valueOf(userId));
+                                                            String.valueOf(user_id));
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
@@ -75,8 +76,8 @@ public class FaceController {
             }
 
             int exitCode =  process.waitFor();
-            log.info("faceController1 : {}", userId);
-            String samePerson = faceService.detectFace(userId);
+            log.info("faceController1 : {}", user_id);
+            String samePerson = faceService.detectFace(user_id);
             log.info("faceController2 : {}", samePerson);
 
             // 얼굴, 신분증 사진 삭제
