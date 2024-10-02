@@ -59,26 +59,10 @@ public class FaceController {
             pb.redirectErrorStream(true);
 
             Process process = pb.start();
-            //
-            // 표준 출력과 오류 출력 스트림 읽기
-            BufferedReader outputReader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            BufferedReader errorReader = new BufferedReader(new InputStreamReader(process.getErrorStream()));
-
-            // 표준 출력 로그
-            String line;
-            while ((line = outputReader.readLine()) != null) {
-                System.out.println("Python output: " + line);
-            }
-
-            // 오류 출력 로그
-            while ((line = errorReader.readLine()) != null) {
-                System.err.println("Python error: " + line);
-            }
 
             int exitCode =  process.waitFor();
-            log.info("faceController1 : {}", user_id);
             String samePerson = faceService.detectFace(user_id);
-            log.info("faceController2 : {}", samePerson);
+            log.debug("faceController : {}", samePerson);
 
             // 얼굴, 신분증 사진 삭제
             Files.delete(licenseFile.toPath());
