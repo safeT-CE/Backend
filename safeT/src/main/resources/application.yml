@@ -46,3 +46,13 @@ coolsms:
     key: ${coolsms.api.key}
     secret: ${coolsms.api.secret}
     sendNumber: ${coolsms.sendnumber}
+
+kakao:
+  api:
+    url: ${KAKAO_API_URL}
+  app:
+    key: ${KAKAO_APP_KEY}
+
+detection:
+  api:
+    url: ${DETECTION_API_URL}
