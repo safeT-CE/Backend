@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = "/penalty")
+@RequestMapping(value = "/penalty", produces = "application/json; charset=UTF-8")
 public class PenaltyController {
 
     @Autowired

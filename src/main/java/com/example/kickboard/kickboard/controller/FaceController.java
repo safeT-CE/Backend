@@ -48,7 +48,6 @@ public class FaceController {
         try{
             File licenseFile = new File(temDir.toFile(), licenseImage.getOriginalFilename());
             File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
-
             licenseImage.transferTo(licenseFile);
             faceImage.transferTo(faceFile);
 
