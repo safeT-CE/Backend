@@ -1,6 +1,5 @@
 package com.example.kickboard.login.repository;
 
-import com.example.kickboard.kickboard.dto.ProfileResponse;
 import com.example.kickboard.login.entity.User;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
