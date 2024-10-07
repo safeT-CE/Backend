@@ -23,7 +23,7 @@ public class Rental {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    private Long userId;
 
     @Column(name = "kickboard_id", nullable = false)
     private Long kickboardId;
