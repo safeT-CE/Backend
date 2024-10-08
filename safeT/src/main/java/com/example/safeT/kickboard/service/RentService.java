@@ -30,6 +30,17 @@ public class RentService {
     @Autowired
     private PenaltyRepository penaltyRepository;
 
+    // 킥보드 QR 코드로 조회
+    public Kickboard getKickboardByQrCode(String qrCode) {
+        return kickboardRepository.findByQrCode(qrCode);
+    }
+
+    // 킥보드 대여 ID로 조회
+    public Kickboard getKickboardByRentalId(Long rentalId) {
+        Optional<Rental> rentalOptional = rentalRecordRepository.findById(rentalId);
+        return rentalOptional.map(rental -> kickboardRepository.findById(rental.getKickboardId()).orElse(null)).orElse(null);
+    }
+
     // 킥보드 대여
     @Transactional
     public String rentKickboard(Long kickboardId, Long userId, Long penaltyId) {
