@@ -21,7 +21,7 @@ public class Kickboard {
     private String qrCode;
 
     @Column(name = "model", nullable = false)
-    private String model;
+    private Long model;
 
     // 킥보드 현재 상태
     @Column(name = "status", nullable = false)

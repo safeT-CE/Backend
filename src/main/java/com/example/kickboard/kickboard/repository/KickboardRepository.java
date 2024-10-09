@@ -18,4 +18,12 @@ public interface KickboardRepository extends JpaRepository<Kickboard, Long> {
     // 킥보드 ID로 킥보드 대여 여부 조회
     @Query("SELECT k.rented FROM Kickboard k WHERE k.id = :id")
     Boolean findRentedById(@Param("id") Long id);
+
+    // 킥보드 이름으로 킥보드 유무 조회
+    @Query("SELECT k.rented FROM Kickboard k WHERE k.model = :model")
+    Boolean findRentedByModel(@Param("model") Long model);
+    @Query("SELECT k.rented FROM Kickboard k WHERE k.qrCode = :qrCode")
+    Boolean findRentedByQrCode(@Param("qrCode") String qrCode);
+
+    Kickboard findByModel(Long model);
 }

@@ -2,6 +2,7 @@ package com.example.kickboard.kickboard.service;
 
 import org.springframework.stereotype.Service;
 import java.io.BufferedReader;
+
 import java.io.InputStreamReader;
 
 @Service
@@ -31,7 +32,7 @@ public class AIService {
     }
 
     // 얼굴 인식 기능 호출
-    public String sendUserIdToPython(String userId) {
+    public String sendUserIdToPython(String userId, String identity, String faceFile) {
         return executePythonScript("C:/safeT/ai_integration/Face_Recogniton/dataNface.py", userId);
     }
 
@@ -48,5 +49,34 @@ public class AIService {
     // 횡단보도 감지 기능 호출
     public String detectCrosswalk(String userId) {
         return executePythonScript("C:/safeT/ai_integration/Crosswalk_Detection/crosswalk_detection.py", userId);
+    }
+
+
+    // 효
+    public String sendToPython(String userId, String faceFile) {
+        return executePythonScripts("C:/safeT/ai_integration/Face_Recogniton/dataNface.py", userId, faceFile);
+    }
+
+    // 파이썬 코드 실행 및 결과 반환
+    private String executePythonScripts(String scriptPath, String userId, String faceFile) {
+        try {
+            ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath, userId, faceFile);
+            Process process = processBuilder.start();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            StringBuilder result = new StringBuilder();
+            String line;
+            while ((line = reader.readLine()) != null) {
+                result.append(line);
+            }
+            int exitCode = process.waitFor();
+            if (exitCode == 0) {
+                return result.toString();
+            } else {
+                return "Error executing Python script.";
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Exception occurred: " + e.getMessage();
+        }
     }
 }

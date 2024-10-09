@@ -1,6 +1,7 @@
 package com.example.kickboard.kickboard.controller;
 
 
+import com.example.kickboard.kickboard.dto.RentalRequest;
 import com.example.kickboard.kickboard.entity.Kickboard;
 import com.example.kickboard.kickboard.service.AIService;
 import com.example.kickboard.kickboard.service.RentService;
@@ -8,6 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/kickboard/rent")
@@ -18,6 +25,7 @@ public class RentController {
 
     @Autowired
     private AIService aiService;
+
 
     // 킥보드 상세 정보 조회
     @GetMapping("/details")
@@ -42,6 +50,59 @@ public class RentController {
         }
     }
 
+
+    // 대여 킥보드 유효성 검사 : 사용함 : 효
+    @PostMapping("/validate")
+    public ResponseEntity<String> validateQrOrNumber(@RequestBody RentalRequest rentalRequest) {
+        // QR 코드와 모델 중 하나만 있으면 검증을 진행
+        boolean isValid = false;
+        if (rentalRequest.getQrCode() != null) {
+            isValid = rentService.validateRentalByQrCode(rentalRequest.getQrCode());
+        } else if (rentalRequest.getModel() != null) {
+            isValid = rentService.validateRentalByModel(rentalRequest.getModel());
+        }
+
+        if (isValid) {
+            return ResponseEntity.ok("대여 가능");
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("대여 불가");
+        }
+    }
+
+
+    // 얼굴 동일성 인증 : 사용함 요청할 때 필요한 코드가 해당 user의 identity랑 인식한 얼굴 사진 : 효
+    @PostMapping("/identify")
+    public ResponseEntity<String> identifyFace(@RequestParam("userId") String userId,
+                                                @RequestParam("faceImage") MultipartFile faceImage) {
+
+        // 사진 관리
+        Path temDir;
+        try {
+            temDir = Files.createTempDirectory("uploads");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("얼굴 인증 실패");
+        }
+
+        // 면허증, 얼굴 사진 저장
+        try {
+            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
+            faceImage.transferTo(faceFile);
+
+            // 얼굴 인식 기능 호출
+            String faceRecognitionResult = aiService.sendToPython(
+                    userId.toString(), faceFile.getAbsolutePath());
+
+            // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
+            if (!"동일인입니다.".equals(faceRecognitionResult)) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return ResponseEntity.ok("얼굴 동일성 판단 성공");
+    }
+
     // 킥보드 대여 요청 처리
     @PostMapping
     public ResponseEntity<String> rentKickboard(@RequestParam Long kickboardId,
@@ -49,12 +110,12 @@ public class RentController {
                                                 @RequestParam Long penaltyId) {
         try {
             // 얼굴 인식 기능 호출
-            String faceRecognitionResult = aiService.sendUserIdToPython(userId.toString());
+            //String faceRecognitionResult = aiService.sendUserIdToPython(userId.toString());
 
             // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
-            if (!"동일인입니다.".equals(faceRecognitionResult)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Face recognition did not match. Rental not allowed.");
-            }
+//            if (!"동일인입니다.".equals(faceRecognitionResult)) {
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Face recognition did not match. Rental not allowed.");
+//            }
 
             // 킥보드 대여 처리
             String result = rentService.rentKickboard(kickboardId, userId, penaltyId);

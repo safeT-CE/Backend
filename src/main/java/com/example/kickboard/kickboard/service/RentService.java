@@ -83,4 +83,20 @@ public class RentService {
 
         return "Kickboard rented successfully";
     }
+
+    public boolean validateRentalByQrCode(String qrCode) {
+        if (kickboardRepository.findRentedByQrCode(qrCode) || kickboardRepository.findByQrCode(qrCode) == null)
+            return false;
+        return true;
+    }
+
+    public boolean validateRentalByModel(Long model) {
+        if (kickboardRepository.findRentedByModel(model) || kickboardRepository.findByModel(model) == null)
+            return false;
+        return true;
+    }
+
+    public String findIdentity(Long userId) {
+        return userRepository.findIdentityById(userId);
+    }
 }
