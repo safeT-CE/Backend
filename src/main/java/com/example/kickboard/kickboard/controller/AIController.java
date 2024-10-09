@@ -12,7 +12,7 @@ public class AIController {
     private AIService aiService;
 
     // 얼굴 인식 요청 처리
-    @GetMapping("/face-recognition")
+/*    @GetMapping("/face-recognition")
     public ResponseEntity<String> faceRecognition(@RequestParam String userId) {
         try {
             String result = aiService.sendUserIdToPython(userId);
@@ -21,7 +21,7 @@ public class AIController {
             return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
         }
     }
-
+*/
     // 헬멧 감지 요청 처리
     @GetMapping("/helmet-detection")
     public ResponseEntity<String> helmetDetection(@RequestParam String userId) {
