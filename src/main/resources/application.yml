@@ -1,0 +1,52 @@
+spring:
+    http:
+        encoding:
+            charset: UTF-8
+            enabled: true
+            force: true
+    datasource:
+        url : ${SPRING_DATASOURCE_URL}
+        username: root
+        password: ${SPRING_DATASOURCE_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+    jpa:
+        hibernate:
+            ddl-auto: update
+        show-sql: true
+        properties:
+            hibernate:
+                dialect: org.hibernate.dialect.MySQL8Dialect
+    logging:
+        level:
+            org:
+                springframework: DEBUG
+    messages:
+        base-name: i18n/messages
+        encoding: UTF-8
+        cache-duration: PT1H
+    redis:
+        host: ${COOL_SMS_HOST}
+        port: ${COOL_SMS_PORT}
+        repositories:
+            enabled: false
+    coolsms:
+        api:
+            key: ${COOL_SMS_KEY}
+            secret: ${COOL_SMS_SECRET}
+            sendNumber: ${COOL_SMS_NUMBER}
+server:
+    port: 8080
+    address: 0.0.0.0
+cloud:
+    aws:
+        credentials:
+            accessKey: ${AWS_ACCESS_KEY}
+            secretKey: ${AWS_SECRET_KEY}
+        region:
+            static: ${AWS_REGION}
+        stack:
+            auto: false
+
+application:
+    bucket:
+        name: ${AWS_BUCKET_NAME}
