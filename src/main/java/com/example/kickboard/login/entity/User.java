@@ -52,7 +52,7 @@ public class User {
     @Column(name = "identity", columnDefinition = "VARCHAR(255)")
     private String identity;
 
-    @Column(name = "samePerson")
+    @Column(name = "same_person")
     private String samePerson;
 
     public void setUseTime(LocalTime useTime) {
