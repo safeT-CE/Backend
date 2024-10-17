@@ -42,7 +42,7 @@ public class RentService {
 
     // 킥보드 대여
     @Transactional
-    public String rentKickboard(Long kickboardId, Long userId, Long penaltyId) {
+    public String rentKickboard(Long kickboardId, Long userId){//, Long penaltyId) {
         // 킥보드 존재 여부 확인
         Optional<Kickboard> kickboardOptional = kickboardRepository.findById(kickboardId);
         if (kickboardOptional.isEmpty()) {
@@ -63,10 +63,10 @@ public class RentService {
         }
 
         // 벌점 존재 여부 확인
-        Penalty penalty = penaltyRepository.findById(penaltyId).orElse(null);
-        if (penalty == null) {
-            return "Penalty not found";
-        }
+//        Penalty penalty = penaltyRepository.findById(penaltyId).orElse(null);
+//        if (penalty == null) {
+//            return "Penalty not found";
+//        }
 
         // 킥보드 대여 상태 변경
         kickboard.setRented(true);
@@ -76,7 +76,7 @@ public class RentService {
         Rental rental = new Rental();
         rental.setKickboardId(kickboardId);
         rental.setUser(user);   // 수정
-        rental.setPenaltyId(penaltyId);
+        //rental.setPenaltyId(penaltyId);
         rental.setRentedAt(LocalDateTime.now());
         rental.setReturned(false);
         rentalRecordRepository.save(rental);

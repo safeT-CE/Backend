@@ -106,8 +106,8 @@ public class RentController {
     // 킥보드 대여 요청 처리
     @PostMapping
     public ResponseEntity<String> rentKickboard(@RequestParam Long kickboardId,
-                                                @RequestParam Long userId,
-                                                @RequestParam Long penaltyId) {
+                                                @RequestParam Long userId){
+                                                //@RequestParam Long penaltyId) {
         try {
             // 얼굴 인식 기능 호출
             //String faceRecognitionResult = aiService.sendUserIdToPython(userId.toString());
@@ -118,7 +118,8 @@ public class RentController {
 //            }
 
             // 킥보드 대여 처리
-            String result = rentService.rentKickboard(kickboardId, userId, penaltyId);
+            //String result = rentService.rentKickboard(kickboardId, userId, penaltyId);
+            String result = rentService.rentKickboard(kickboardId, userId);
             if (!"Kickboard rented successfully".equals(result)) {
                 return ResponseEntity.badRequest().body(result);
             }
