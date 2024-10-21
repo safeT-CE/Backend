@@ -3,7 +3,6 @@ package com.example.kickboard.kickboard.dto;
 import com.example.kickboard.kickboard.entity.Location;
 import lombok.Getter;
 import lombok.Setter;
-import java.time.LocalDateTime;
 
 @Getter
 @Setter

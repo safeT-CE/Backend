@@ -9,12 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/kickboard/rent")
@@ -85,22 +88,47 @@ public class RentController {
         }
 
         // 면허증, 얼굴 사진 저장
+        File faceFile;
         try {
-            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
+            faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
             faceImage.transferTo(faceFile);
-
-            // 얼굴 인식 기능 호출
-            String faceRecognitionResult = aiService.sendToPython(
-                    userId.toString(), faceFile.getAbsolutePath());
-
-            // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
-            if (!"동일인입니다.".equals(faceRecognitionResult)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
-            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-        return ResponseEntity.ok("얼굴 동일성 판단 성공");
+
+        // Flask 서버로 요청 보내기
+        RestTemplate restTemplate = new RestTemplate();
+        String url = "http://localhost:5000/face-detection"; // Flask 서버의 엔드포인트 URL
+        Map<String, String> request = new HashMap<>();
+        request.put("userId", userId);
+        request.put("faceFile", faceFile.getAbsolutePath());
+
+        ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+        // 얼굴 인식 결과 처리
+        if (response.getBody().contains("동일인입니다.")) {
+            return ResponseEntity.ok("얼굴 동일성 판단 성공");
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
+        }
+
+//        // 면허증, 얼굴 사진 저장
+//        try {
+//            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
+//            faceImage.transferTo(faceFile);
+//
+//            // 얼굴 인식 기능 호출
+//            String faceRecognitionResult = aiService.sendToPython(
+//                    userId.toString(), faceFile.getAbsolutePath());
+//
+//            // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
+//            if (!"동일인입니다.".equals(faceRecognitionResult)) {
+//                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
+//            }
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//        return ResponseEntity.ok("얼굴 동일성 판단 성공");
     }
 
     // 킥보드 대여 요청 처리
