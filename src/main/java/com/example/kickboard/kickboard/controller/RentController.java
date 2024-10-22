@@ -5,6 +5,7 @@ import com.example.kickboard.kickboard.dto.RentalRequest;
 import com.example.kickboard.kickboard.entity.Kickboard;
 import com.example.kickboard.kickboard.service.AIService;
 import com.example.kickboard.kickboard.service.RentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.nio.file.Path;
 
 @RestController
 @RequestMapping("/kickboard/rent")
+@Slf4j
 public class RentController {
 
     @Autowired
@@ -75,6 +77,8 @@ public class RentController {
     @PostMapping("/identify")
     public ResponseEntity<String> identifyFace(@RequestParam("userId") String userId,
                                                 @RequestParam("faceImage") MultipartFile faceImage) {
+
+        log.info("RentController1 : {}", faceImage);
 
         // 사진 관리
         Path temDir;
