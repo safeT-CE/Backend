@@ -1,22 +1,22 @@
 package com.example.kickboard.kickboard.controller;
 
-
 import com.example.kickboard.kickboard.dto.RentalRequest;
 import com.example.kickboard.kickboard.entity.Kickboard;
 import com.example.kickboard.kickboard.service.AIService;
 import com.example.kickboard.kickboard.service.RentService;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/kickboard/rent")
@@ -76,10 +76,9 @@ public class RentController {
     // 얼굴 동일성 인증 : 사용함 요청할 때 필요한 코드가 해당 user의 identity랑 인식한 얼굴 사진 : 효
     @PostMapping("/identify")
     public ResponseEntity<String> identifyFace(@RequestParam("userId") String userId,
-                                                @RequestParam("faceImage") MultipartFile faceImage) {
+                                               @RequestParam("faceImage") MultipartFile faceImage) {
 
-        log.info("RentController1 : {}", faceImage);
-
+        Long user_id = Long.parseLong(userId);
         // 사진 관리
         Path temDir;
         try {
@@ -95,11 +94,15 @@ public class RentController {
             faceImage.transferTo(faceFile);
 
             // 얼굴 인식 기능 호출
-            String faceRecognitionResult = aiService.sendToPython(
-                    userId.toString(), faceFile.getAbsolutePath());
+            ResponseEntity<Map<String, Object>> faceRecognitionResult = aiService.sendToPython(
+                    user_id, faceFile.getAbsolutePath());
+
+            Map<String, Object> responseBody = faceRecognitionResult.getBody();
+            String result = (String) responseBody.get("result");
+            log.info("RentController1 : {}", result);
 
             // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
-            if (!"동일인입니다.".equals(faceRecognitionResult)) {
+            if (!"동일인입니다.".equals(result)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
             }
         } catch (IOException e) {
@@ -108,19 +111,81 @@ public class RentController {
         return ResponseEntity.ok("얼굴 동일성 판단 성공");
     }
 
+
+    // 얼굴 동일성 인증 : userId만 전송했을 때 (확인용)
+    @PostMapping("/identify_userId")
+    public ResponseEntity<String> identifyFaceUserId(@RequestParam("userId") String userId){
+
+        Long user_id = Long.parseLong(userId);
+        // 사진 관리
+        Path temDir;
+        try {
+            temDir = Files.createTempDirectory("uploads");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("얼굴 인증 실패");
+        }
+
+        // 얼굴 인식 기능 호출
+        ResponseEntity<Map<String, Object>> faceRecognitionResult = aiService.sendToPythonUserId(user_id);
+        Map<String, Object> responseBody = faceRecognitionResult.getBody();
+
+        String result = (String) responseBody.get("result");
+
+        // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
+        if (!"동일인입니다.".equals(result)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
+        }
+        return ResponseEntity.ok("얼굴 동일성 판단 성공");
+    }
+
+    // 얼굴 동일성 인증 : faceImage 확인용
+    @PostMapping("/reidentify")
+    public ResponseEntity<String> ReidentifyFace(@RequestParam("userId") String userId,
+                                                 @NotNull @RequestParam("faceImage") MultipartFile faceImage) {
+
+        Long user_id = Long.parseLong(userId);
+        // 사진 관리
+        Path temDir;
+        try {
+            temDir = Files.createTempDirectory("uploads");
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("얼굴 인증 실패");
+        }
+
+        // 면허증, 얼굴 사진 저장
+        try {
+            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
+            faceImage.transferTo(faceFile);
+
+            // 얼굴 인식 기능 호출
+            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/redataNface.py",
+                    faceFile.getAbsolutePath(),
+                    String.valueOf(user_id));
+            pb.redirectErrorStream(true);
+
+            Process process = pb.start();
+
+            int exitCode =  process.waitFor();
+
+            // 얼굴 사진 삭제
+            Files.delete(faceFile.toPath());
+
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (IOException | InterruptedException e){
+            e.printStackTrace();
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
     // 킥보드 대여 요청 처리
     @PostMapping
     public ResponseEntity<String> rentKickboard(@RequestParam Long kickboardId,
                                                 @RequestParam Long userId){
                                                 //@RequestParam Long penaltyId) {
         try {
-            // 얼굴 인식 기능 호출
-            //String faceRecognitionResult = aiService.sendUserIdToPython(userId.toString());
-
-            // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
-//            if (!"동일인입니다.".equals(faceRecognitionResult)) {
-//                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Face recognition did not match. Rental not allowed.");
-//            }
 
             // 킥보드 대여 처리
             //String result = rentService.rentKickboard(kickboardId, userId, penaltyId);
