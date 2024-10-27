@@ -73,7 +73,7 @@ public class RentController {
     }
 
 
-    // 얼굴 동일성 인증 : 사용함 요청할 때 필요한 코드가 해당 user의 identity랑 인식한 얼굴 사진 : 효
+    // 얼굴 동일성 인증 : 효
     @PostMapping("/identify")
     public ResponseEntity<String> identifyFace(@RequestParam("userId") String userId,
                                                @RequestParam("faceImage") MultipartFile faceImage) {
@@ -103,82 +103,13 @@ public class RentController {
 
             // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
             if (!"동일인입니다.".equals(result)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("등록된 얼굴과 동일하지 않습니다.");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
         return ResponseEntity.ok("얼굴 동일성 판단 성공");
     }
-
-
-    // 얼굴 동일성 인증 : userId만 전송했을 때 (확인용)
-    @PostMapping("/identify_userId")
-    public ResponseEntity<String> identifyFaceUserId(@RequestParam("userId") String userId){
-
-        Long user_id = Long.parseLong(userId);
-        // 사진 관리
-        Path temDir;
-        try {
-            temDir = Files.createTempDirectory("uploads");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("얼굴 인증 실패");
-        }
-
-        // 얼굴 인식 기능 호출
-        ResponseEntity<Map<String, Object>> faceRecognitionResult = aiService.sendToPythonUserId(user_id);
-        Map<String, Object> responseBody = faceRecognitionResult.getBody();
-
-        String result = (String) responseBody.get("result");
-
-        // 얼굴 인식 결과가 일치하지 않으면 대여 불가능
-        if (!"동일인입니다.".equals(result)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("얼굴 동일성 판단 실패");
-        }
-        return ResponseEntity.ok("얼굴 동일성 판단 성공");
-    }
-
-    // 얼굴 동일성 인증 : faceImage 확인용
-    @PostMapping("/reidentify")
-    public ResponseEntity<String> ReidentifyFace(@RequestParam("userId") String userId,
-                                                 @NotNull @RequestParam("faceImage") MultipartFile faceImage) {
-
-        Long user_id = Long.parseLong(userId);
-        // 사진 관리
-        Path temDir;
-        try {
-            temDir = Files.createTempDirectory("uploads");
-        } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("얼굴 인증 실패");
-        }
-
-        // 면허증, 얼굴 사진 저장
-        try {
-            File faceFile = new File(temDir.toFile(), faceImage.getOriginalFilename());
-            faceImage.transferTo(faceFile);
-
-            // 얼굴 인식 기능 호출
-            ProcessBuilder pb = new ProcessBuilder("python", "C:/Users/SAMSUNG/Desktop/detection/Detection/redataNface.py",
-                    faceFile.getAbsolutePath(),
-                    String.valueOf(user_id));
-            pb.redirectErrorStream(true);
-
-            Process process = pb.start();
-
-            int exitCode =  process.waitFor();
-
-            // 얼굴 사진 삭제
-            Files.delete(faceFile.toPath());
-
-            return new ResponseEntity<>(HttpStatus.OK);
-        } catch (IOException | InterruptedException e){
-            e.printStackTrace();
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
 
     // 킥보드 대여 요청 처리
     @PostMapping
