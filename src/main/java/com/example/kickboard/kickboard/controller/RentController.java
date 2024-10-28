@@ -17,6 +17,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("/kickboard/rent")
@@ -111,42 +114,55 @@ public class RentController {
         return ResponseEntity.ok("얼굴 동일성 판단 성공");
     }
 
-    // 킥보드 대여 요청 처리
+    // 킥보드 대여하기 후, python코드 실행
     @PostMapping
-    public ResponseEntity<String> rentKickboard(@RequestParam Long kickboardId,
-                                                @RequestParam Long userId){
-                                                //@RequestParam Long penaltyId) {
+    public ResponseEntity<String> rentKickboard(@RequestParam("kickboardId") Long kickboardId,
+                                                @RequestParam("userId") Long userId) {
+        log.info("rentKickboard");
         try {
+            // 모든 감지 작업을 비동기로 실행
+            CompletableFuture<String> helmetDetectionFuture = aiService.detectHelmet(userId.toString());
+            CompletableFuture<String> peopleDetectionFuture = aiService.detectPeople(userId.toString());
+            CompletableFuture<String> crosswalkDetectionFuture = aiService.detectCrosswalk(userId.toString());
 
-            // 킥보드 대여 처리
-            //String result = rentService.rentKickboard(kickboardId, userId, penaltyId);
-            String result = rentService.rentKickboard(kickboardId, userId);
-            if (!"Kickboard rented successfully".equals(result)) {
-                return ResponseEntity.badRequest().body(result);
-            }
+            // 모든 작업의 결과가 완료될 때까지 대기
+            CompletableFuture.allOf(helmetDetectionFuture, peopleDetectionFuture, crosswalkDetectionFuture).join();
 
-            // 대여 처리가 완료된 후 헬멧 감지
-            String helmetDetectionResult = aiService.detectHelmet(userId.toString());
+            // 결과 가져오기
+            String helmetDetectionResult = helmetDetectionFuture.get();
+            String peopleDetectionResult = peopleDetectionFuture.get();
+            String crosswalkDetectionResult = crosswalkDetectionFuture.get();
+
+
+            // 헬멧 감지 결과 확인
             if (!"With Helmet".equals(helmetDetectionResult)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Helmet detection failed. A helmet is required.");
             }
 
-            // 2인 이상 탑승 감지
-            String peopleDetectionResult = aiService.detectPeople(userId.toString());
+            // 2인 이상 탑승 감지 결과 확인
             if ("More than two people on board".equals(peopleDetectionResult)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("More than two people detected. This is not allowed.");
             }
 
-            // 횡단보도 인식
-            String crosswalkDetectionResult = aiService.detectCrosswalk(userId.toString());
+            // 횡단보도 감지 결과 확인
             if ("Crosswalk violation detected".equals(crosswalkDetectionResult)) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Crosswalk violation detected. Penalty is recorded.");
             }
 
             return ResponseEntity.ok("Kickboard successfully rented and all checks passed.");
 
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace(); // 예외 내용을 출력하여 디버깅
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An error occurred while renting the kickboard.");
+        }
+    }
+
+    // 프로세스 종료 메서드
+    private void terminateProcess(AtomicReference<Process> processReference) {
+        Process process = processReference.get();
+        if (process != null && process.isAlive()) {
+            process.destroy();
+            processReference.set(null);
         }
     }
 }

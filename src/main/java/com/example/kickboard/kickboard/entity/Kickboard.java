@@ -17,7 +17,7 @@ public class Kickboard {
     @Column(name = "id", updatable = false)
     private Long id;
 
-    @Column(name = "qr_code", nullable = false, unique = true)
+    @Column(name = "qr_code", nullable = true, unique = true)
     private String qrCode;
 
     @Column(name = "model", nullable = false)

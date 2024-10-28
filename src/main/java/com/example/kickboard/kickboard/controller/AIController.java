@@ -11,22 +11,11 @@ public class AIController {
     @Autowired
     private AIService aiService;
 
-    // 얼굴 인식 요청 처리
-/*    @GetMapping("/face-recognition")
-    public ResponseEntity<String> faceRecognition(@RequestParam String userId) {
-        try {
-            String result = aiService.sendUserIdToPython(userId);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
-        }
-    }
-*/
     // 헬멧 감지 요청 처리
     @GetMapping("/helmet-detection")
     public ResponseEntity<String> helmetDetection(@RequestParam String userId) {
         try {
-            String result = aiService.detectHelmet(userId);
+            String result = String.valueOf(aiService.detectHelmet(userId));
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
@@ -38,7 +27,7 @@ public class AIController {
     @GetMapping("/people-detection")
     public ResponseEntity<String> peopleDetection(@RequestParam String userId) {
         try {
-            String result = aiService.detectPeople(userId);
+            String result = String.valueOf(aiService.detectPeople(userId));
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
@@ -46,13 +35,13 @@ public class AIController {
     }
 
     // 횡단보도 감지 요청 처리
-    @GetMapping("/crosswalk-detection")
-    public ResponseEntity<String> crosswalkDetection(@RequestParam String userId) {
-        try {
-            String result = aiService.detectCrosswalk(userId);
-            return ResponseEntity.ok(result);
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
-        }
-    }
+//    @GetMapping("/crosswalk-detection")
+//    public ResponseEntity<String> crosswalkDetection(@RequestParam String userId) {
+//        try {
+//            String result = aiService.detectCrosswalk(userId);
+//            return ResponseEntity.ok(result);
+//        } catch (Exception e) {
+//            return ResponseEntity.status(500).body("An error occurred: " + e.getMessage());
+//        }
+//    }
 }

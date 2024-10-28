@@ -27,8 +27,8 @@ public class Rental {
     @Column(name = "kickboard_id", nullable = false)
     private Long kickboardId;
 
-    @Column(name = "penalty_id", nullable = false)
-    private Long penaltyId;
+//    @Column(name = "penalty_id", nullable = false)
+//    private Long penaltyId;
 
     @Column(name = "rented_at", nullable = false)
     private LocalDateTime rentedAt;

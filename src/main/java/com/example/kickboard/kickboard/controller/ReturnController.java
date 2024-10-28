@@ -15,7 +15,7 @@ public class ReturnController {
 
     // 킥보드 반납 가능 여부 확인
     @PostMapping("/check")
-    public ResponseEntity<String> checkReturnKickboard(@RequestParam("userId") String userId, @RequestParam("kickboardId") String kickboardId){
+    public ResponseEntity<String> checkReturnKickboard(@RequestBody String userId, @RequestBody String kickboardId){
         try {
             String result = returnService.checkKickboard(userId, kickboardId);
             if ("Kickboard returnable".equals(result)) {

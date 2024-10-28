@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.*;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -14,54 +16,12 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @Slf4j
+@EnableAsync
 public class AIService {
-
-    // 파이썬 코드 실행 및 결과 반환
-    private String executePythonScript(String scriptPath, String userId) {
-        try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath, userId);
-            Process process = processBuilder.start();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder result = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                result.append(line);
-            }
-            int exitCode = process.waitFor();
-            if (exitCode == 0) {
-                return result.toString();
-            } else {
-                return "Error executing Python script.";
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Exception occurred: " + e.getMessage();
-        }
-    }
-
-    // 얼굴 인식 기능 호출
-    public String sendUserIdToPython(String userId, String identity, String faceFile) {
-        return executePythonScript("C:/safeT/ai_integration/Face_Recogniton/dataNface.py", userId);
-    }
-
-    // 헬멧 감지 기능 호출
-    public String detectHelmet(String userId) {
-        return executePythonScript("C:/safeT/ai_integration/Person_Detection/realtime_helmet_detection.py", userId);
-    }
-
-    // 2인 이상 탑승 감지 기능 호출
-    public String detectPeople(String userId) {
-        return executePythonScript("C:/safeT/ai_integration/Person_Detection/realtime_person_detection.py", userId);
-    }
-
-    // 횡단보도 감지 기능 호출
-    public String detectCrosswalk(String userId) {
-        return executePythonScript("C:/safeT/ai_integration/Crosswalk_Detection/crosswalk_detection.py", userId);
-    }
-
 
     // 효 : 얼굴 동일성 flask 요청 보내기
     public ResponseEntity<Map<String, Object>> sendToPython(Long userId, String faceFile) {
@@ -79,31 +39,51 @@ public class AIService {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
-                flaskUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {}
+                flaskUrl, HttpMethod.POST, requestEntity, new ParameterizedTypeReference<Map<String, Object>>() {
+                }
         );
         return response;
     }
 
     // 파이썬 코드 실행 및 결과 반환
-    private String executePythonScripts(String scriptPath, String userId, String faceFile) {
+    @Async
+    public CompletableFuture<String> executePythonScript(String scriptPath, String userId) {
+        StringBuilder result = new StringBuilder();
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath, userId, faceFile);
+            ProcessBuilder processBuilder = new ProcessBuilder("python", scriptPath, userId);
             Process process = processBuilder.start();
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
-            StringBuilder result = new StringBuilder();
             String line;
             while ((line = reader.readLine()) != null) {
                 result.append(line);
             }
             int exitCode = process.waitFor();
             if (exitCode == 0) {
-                return result.toString();
+                return CompletableFuture.completedFuture(result.toString());
             } else {
-                return "Error executing Python script.";
+                return CompletableFuture.completedFuture("Error executing Python script.");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            return "Exception occurred: " + e.getMessage();
+            return CompletableFuture.completedFuture("Exception occurred: " + e.getMessage());
         }
+    }
+
+    // 헬멧 감지 기능 호출
+    @Async
+    public CompletableFuture<String> detectHelmet(String userId) {
+        return executePythonScript("C:/Users/SAMSUNG/Desktop/detection/Detection/realtime_helmet_detection.py", userId);
+    }
+
+    // 2인 이상 탑승 감지 기능 호출
+    @Async
+    public CompletableFuture<String> detectPeople(String userId) {
+        return executePythonScript("C:/Users/SAMSUNG/Desktop/detection/Detection/realtime_person_detection.py", userId);
+    }
+
+    // 횡단보도 감지 기능 호출
+    @Async
+    public CompletableFuture<String> detectCrosswalk(String userId) {
+        return executePythonScript("C:/Users/SAMSUNG/Desktop/detection/Detection/crosswalk_detection.py", userId);
     }
 }
